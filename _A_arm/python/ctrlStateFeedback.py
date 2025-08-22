@@ -14,7 +14,7 @@ class ctrlStateFeedback:
         # y = C*x
 
         A = np.array([[0.0, 1.0],
-                      [0.0, -1.0 * P.b / P.m / (P.ell**2)]])
+                      [0.0, -3.0 * P.b / P.m / (P.ell**2)]])
         B = np.array([[0.0],
                       [3.0 / P.m / (P.ell**2)]])        
         C = np.array([[1.0, 0.0]])

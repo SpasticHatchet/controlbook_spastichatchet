@@ -19,13 +19,14 @@ class ctrlDisturbanceObserver :
         # xdot = A*x + B*u
         # y = C*x
         A = np.array([[0.0, 1.0],
-                      [0.0, -1.0 * P.b / P.m / (P.ell**2)]])
+                      [0.0, -3.0 * P.b / P.m / (P.ell**2)]])
         B = np.array([[0.0],
                       [3.0 / P.m / (P.ell**2)]])        
         C = np.array([[1.0, 0.0]])
+        
         # form augmented system
         A1 = np.array([[0.0, 1.0, 0.0],
-                       [0.0, -1.0 * P.b / P.m / (P.ell**2), 0.0],
+                       [0.0, -3.0 * P.b / P.m / (P.ell**2), 0.0],
                        [-1.0, 0.0, 0.0]])
         B1 = np.array([[0.0],
                        [3.0 / P.m / (P.ell**2)],

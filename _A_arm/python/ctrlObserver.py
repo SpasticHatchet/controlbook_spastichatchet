@@ -19,7 +19,7 @@ class ctrlObserver:
         # xdot = A*x + B*u
         # y = C*x
         self.A = np.array([[0.0, 1.0],
-                          [0.0, -1.0 * P.b / P.m / (P.ell**2)]])
+                          [0.0, -3.0 * P.b / P.m / (P.ell**2)]])
         self.B = np.array([[0.0],
                            [3.0 / P.m / (P.ell**2)]])        
         self.C = np.array([[1.0, 0.0]])
