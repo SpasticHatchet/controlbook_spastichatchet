@@ -8,10 +8,11 @@ class ctrlObserver:
         #--------------------------------------------------
         # State Feedback Control Design
         #--------------------------------------------------
-        #  tuning parameters
+        #  tuning parameters - these are similar to A.12, but 
+        #  do not match exactly. 
         tr = 0.4
         zeta = 0.707
-        integrator_pole = 9
+        integrator_pole = -9
         tr_obs = tr/10  # rise time frequency for observer
         zeta_obs = 0.707  # damping ratio for observer
 
@@ -32,7 +33,7 @@ class ctrlObserver:
         # gain calculation
         wn = 2.2 / tr  # natural frequency
         des_char_poly = np.convolve([1, 2*zeta*wn, wn**2],
-                                    [1, integrator_pole])
+                                    [1, -integrator_pole])
         des_poles = np.roots(des_char_poly)
         
         # Compute the gains if the system is controllable

@@ -9,7 +9,7 @@ class ctrlStateFeedbackIntegrator:
         # State Feedback Control Design
         #--------------------------------------------------
         #  tuning parameters
-        tr = 0.4
+        tr = 0.4890
         zeta = 0.707
         integrator_pole = -5.
         # State Space Equations

@@ -6,7 +6,7 @@ class ctrlStateFeedback:
     # dirty derivatives to estimate thetadot
     def __init__(self):
         #  tuning parameters
-        tr = 0.4
+        tr = 0.4890
         zeta = 0.707
 
         # State Space Equations

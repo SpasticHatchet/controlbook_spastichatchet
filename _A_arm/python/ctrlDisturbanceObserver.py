@@ -9,11 +9,11 @@ class ctrlDisturbanceObserver :
         #--------------------------------------------------
         #  tuning parameters
         tr = 0.4
-        zeta = 0.707
-        integrator_pole = 5
+        zeta = 0.95
+        integrator_pole = -9
         wn_obs = 10            # natural frequency for observer
         zeta_obs = 0.707       # damping ratio for observer
-        dist_obsv_pole = 5.5  # pole for disturbance observer
+        dist_obsv_pole = -5.5  # pole for disturbance observer
 
         # State Space Equations
         # xdot = A*x + B*u
@@ -33,11 +33,11 @@ class ctrlDisturbanceObserver :
                        [0.0]])
 
         # gain calculation
-        wn = 2.2 / tr  # natural frequency
-        #wn = 0.5*np.pi/(tr*np.sqrt(1-zeta**2)) # natural frequency
+        wn = 0.5*np.pi/(tr*np.sqrt(1-zeta**2)) # natural frequency
         des_char_poly = np.convolve([1, 2 * zeta * wn, wn**2],
-                                    [1, integrator_pole])
+                                    [1, -integrator_pole])
         des_poles = np.roots(des_char_poly)
+
         # Compute the gains if the system is controllable
         if np.linalg.matrix_rank(cnt.ctrb(A1, B1)) != 3:
             print("The system is not controllable")
@@ -45,6 +45,7 @@ class ctrlDisturbanceObserver :
             K1 = cnt.place(A1, B1, des_poles)
             self.K = K1[0][0:2]
             self.ki = K1[0][2]
+
         # observer design
         # Augmented Matrices
         A2 = np.concatenate((
@@ -55,7 +56,7 @@ class ctrlDisturbanceObserver :
         C2 = np.concatenate((C, np.zeros((1, 1))), axis=1)
         des_char_est = np.array([1., 2.*zeta*wn_obs, wn_obs**2.])
         des_obsv_char_poly = np.convolve([1, 2 * zeta_obs * wn_obs, wn_obs**2],
-                                         [1, dist_obsv_pole])
+                                         [1, -dist_obsv_pole])
         des_obsv_poles = np.roots(des_obsv_char_poly)
         # Compute the gains if the system is observable
         if np.linalg.matrix_rank(cnt.ctrb(A2.T, C2.T)) != 3:
@@ -85,12 +86,15 @@ class ctrlDisturbanceObserver :
         # update the observer and extract theta_hat
         x_hat, d_hat = self.update_observer(y_m)
         theta_hat = x_hat[0][0]
+        
         # integrate error
         error = theta_r - theta_hat
         self.integrator = self.integrator + (P.Ts / 2.0) * (error + self.error_d1)
         self.error_d1 = error
+        
         # compute feedback linearizing torque tau_fl
         tau_fl = P.m * P.g * (P.ell / 2.0) * np.cos(theta_hat)
+        
         # Compute the state feedback controller
         tau_tilde = -self.K @ x_hat - self.ki * self.integrator - d_hat
 
