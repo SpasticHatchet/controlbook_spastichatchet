@@ -48,7 +48,7 @@ class ctrlStateFeedback:
     def update(self, phi_r, x):
         # Compute the state feedback controller
         tau_unsat = -self.K @ x + self.kr * phi_r
-        tau = saturate(tau_unsat[0][0], P.tau_max)
+        tau = saturate(tau_unsat[0, 0], P.tau_max)
         return tau
 
 

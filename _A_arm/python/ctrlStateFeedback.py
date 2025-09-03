@@ -36,7 +36,7 @@ class ctrlStateFeedback:
         print(des_poles)
 
     def update(self, theta_r, x):
-        theta = x[0][0]
+        theta = x[0, 0]
         # compute feedback linearizing torque tau_fl
         tau_fl = P.m * P.g * (P.ell / 2.0) * np.cos(theta)
 
@@ -44,7 +44,7 @@ class ctrlStateFeedback:
         tau_tilde = -self.K @ x + self.kr * theta_r
 
         # compute total torque
-        tau = saturate(tau_fl + tau_tilde[0][0], P.tau_max)
+        tau = saturate(tau_fl + tau_tilde[0, 0], P.tau_max)
 
         return tau
 

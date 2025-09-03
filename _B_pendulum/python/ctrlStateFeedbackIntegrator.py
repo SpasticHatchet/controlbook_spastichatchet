@@ -58,8 +58,8 @@ class ctrlStateFeedbackIntegrator:
             print("The system is not controllable")
         else:
             K1 = cnt.place(A1, B1, des_poles)
-            self.K = K1[0][0:4]
-            self.ki = K1[0][4]
+            self.K = K1[:, 0:4]
+            self.ki = K1[0, 4]
 
         # print gains to terminal
         print('K: ', self.K)
@@ -74,7 +74,7 @@ class ctrlStateFeedbackIntegrator:
         self.error_z_d1 = 0.0  # error signal delayed by 1 sample
 
     def update(self, z_r, x):
-        z = x[0][0]
+        z = x[0, 0]
 
         # integrate error
         error_z = z_r - z
@@ -86,7 +86,7 @@ class ctrlStateFeedbackIntegrator:
 
         # Compute the state feedback controller
         F_unsat = -self.K @ x - self.ki * self.integrator_z
-        F = saturate(F_unsat[0], P.F_max)
+        F = saturate(F_unsat[0, 0], P.F_max)
 
         return F
 

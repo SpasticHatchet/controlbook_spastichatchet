@@ -63,8 +63,8 @@ class ctrlDisturbanceObserver:
             print("The system is not controllable")
         else:
             K1 = cnt.place(A1, B1, des_poles)
-            self.K = K1[0][0:4]
-            self.ki = K1[0][4]
+            self.K = K1[:, 0:4]
+            self.ki = K1[0, 4]
         
         # compute observer gains
         # Augmented Matrices
@@ -118,7 +118,7 @@ class ctrlDisturbanceObserver:
     def update(self, z_r, y):
         # update the observer and extract z_hat
         x_hat, d_hat = self.update_observer(y)
-        z_hat = x_hat[0][0]
+        z_hat = x_hat[0, 0]
         
         # integrate error
         error_z = z_r - z_hat
@@ -141,7 +141,7 @@ class ctrlDisturbanceObserver:
         F4 = self.obsv_f(self.obsv_state + P.Ts * F3, y)
         self.obsv_state = self.obsv_state + P.Ts / 6 * (F1 + 2*F2 + 2*F3 + F4)
         x_hat = self.obsv_state[0:4]
-        d_hat = self.obsv_state[4][0]
+        d_hat = self.obsv_state[4, 0]
         
         return x_hat, d_hat
 

@@ -60,10 +60,10 @@ class ctrlPD:
         self.filter = zeroCancelingFilter(DC_gain)
 
     def update(self, z_r, state):
-        z = state[0][0]
-        theta = state[1][0]
-        zdot = state[2][0]
-        thetadot = state[3][0]
+        z = state[0, 0]
+        theta = state[1, 0]
+        zdot = state[2, 0]
+        thetadot = state[3, 0]
 
         # the reference angle for theta comes from the
         # outer loop PD control

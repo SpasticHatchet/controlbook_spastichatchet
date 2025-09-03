@@ -20,8 +20,8 @@ class ctrlPD:
         self.use_feedback_linearization = True
 
     def update(self, theta_r, x):
-        theta = x[0][0]
-        thetadot = x[1][0]
+        theta = x[0, 0]
+        thetadot = x[1, 0]
 
         # compute the linearized torque using PD control
         tau_tilde = self.kp * (theta_r - theta) - self.kd * thetadot

@@ -46,8 +46,8 @@ class ctrlPD:
                     [-P.k + P.Jp * wn_phi**2],
                     [-P.b + 2 * P.Jp * zeta_phi * wn_phi]])
         tmp = np.linalg.inv(AA) @ bb
-        self.kp_phi = tmp[0][0]
-        self.kd_phi = tmp[1][0]
+        self.kp_phi = tmp[0, 0]
+        self.kd_phi = tmp[1, 0]
 
         # DC gain for outer loop
         k_DC_phi = P.k * DC_th * self.kp_phi \
@@ -61,10 +61,10 @@ class ctrlPD:
         print('kd_phi: ', self.kd_phi)
 
     def update(self, phi_r, state):
-        theta = state[0][0]
-        phi = state[1][0]
-        thetadot = state[2][0]
-        phidot = state[3][0]
+        theta = state[0, 0]
+        phi = state[1, 0]
+        thetadot = state[2, 0]
+        phidot = state[3, 0]
 
         #---------------------------------------------------
         # outer loop: outputs the reference angle for theta

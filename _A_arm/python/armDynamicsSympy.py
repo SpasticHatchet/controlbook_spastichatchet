@@ -50,7 +50,7 @@ class armDynamics:
     def h(self):
         # return y = h(x) - this is a model of what we can measure, and the output we are
         # trying to control. In this case, we can measure the angle of the robot arm. 
-        theta = self.state[0][0]
+        theta = self.state[0, 0]
         y = np.array([[theta]])
 
         return y

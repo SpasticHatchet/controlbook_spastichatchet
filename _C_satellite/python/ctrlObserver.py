@@ -54,8 +54,8 @@ class ctrlObserver:
             print("The system is not controllable")
         else:
             K1 = cnt.place(A1, B1, des_poles)
-            self.K = K1[0][0:4]
-            self.ki = K1[0][4]
+            self.K = K1[:, 0:4]
+            self.ki = K1[0, 4]
 
         # compute observer gains
         # pick observer poles
@@ -97,7 +97,7 @@ class ctrlObserver:
     def update(self, phi_r, y):
         # update the observer and extract z_hat
         x_hat = self.update_observer(y)
-        phi_hat = x_hat[1][0]
+        phi_hat = x_hat[1, 0]
         
         # integrate error
         error_phi = phi_r - phi_hat
@@ -107,7 +107,7 @@ class ctrlObserver:
         
         # Compute the state feedback controller
         tau_unsat = -self.K @ x_hat - self.ki * self.integrator_phi
-        tau = saturate(tau_unsat[0], P.tau_max)
+        tau = saturate(tau_unsat[0, 0], P.tau_max)
         self.tau_d1 = tau
         return tau, x_hat
 

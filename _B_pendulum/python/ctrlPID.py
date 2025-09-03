@@ -76,8 +76,8 @@ class ctrlPID:
         self.theta_prev = P.theta0
         
     def update(self, z_r, y):
-        z = y[0][0]
-        theta = y[1][0]
+        z = y[0, 0]
+        theta = y[1, 0]
         #---------------------------------------------------
         # Update Outer Loop (z-control)
         #---------------------------------------------------

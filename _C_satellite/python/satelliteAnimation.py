@@ -49,8 +49,8 @@ class satelliteAnimation:
 
     def update(self, u):
         # Process inputs to function
-        theta = u[0][0]   # Angle of base, rad
-        phi = u[1][0]     # angle of panel, rad
+        theta = u[0, 0]   # Angle of base, rad
+        phi = u[1, 0]     # angle of panel, rad
         self.drawBase(theta)
         self.drawPanel(phi)
         # This will cause the image to not distort

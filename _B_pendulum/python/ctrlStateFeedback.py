@@ -56,7 +56,7 @@ class ctrlStateFeedback:
     def update(self, z_r, x):
         # Compute the state feedback controller
         F_unsat = -self.K @ x + self.kr * z_r
-        F = saturate(F_unsat[0][0], P.F_max)
+        F = saturate(F_unsat[0, 0], P.F_max)
         return F
 
 
