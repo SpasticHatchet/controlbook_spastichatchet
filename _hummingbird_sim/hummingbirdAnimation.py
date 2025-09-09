@@ -2,6 +2,7 @@
 hummingbirdAnimation
         12/2022 - R.W. Beard
 """
+import sys
 import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.opengl as gl
@@ -12,7 +13,9 @@ import signal
 class HummingbirdAnimation:
     def __init__(self):
         # initialize Qt gui application and window
-        self.app = pg.QtWidgets.QApplication([])  # initialize QT
+        self.app = pg.QtWidgets.QApplication.instance()
+        if self.app is None:
+            self.app = pg.QtWidgets.QApplication(sys.argv)
         self.window = gl.GLViewWidget()  # initialize the view object
         self.window.setWindowTitle('Hummingbird Viewer')
         # args: upper_left_x, upper_right_y, width, height
