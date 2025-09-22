@@ -21,7 +21,7 @@ print(total velocity is:, total_robot_vel)
 
 # TODO: answer the following questions as a comment below:
 # After getting it to print, look at the output.
-# Is the result the sum of the two velocities?
+# Is the result the sum of the two velocities (a single vector with 3 numbers)?
 # Answer:
 
 # If not, what did the + operation do? and what ideas do you have to compute the sum?
@@ -41,7 +41,7 @@ total_robot_vel_np = arm_vel_np + base_vel_np
 print('total velocity is:', total_robot_vel_np)
 
 # TODO: answer this question as a comment below:
-# Did this compute the sum of the two velocities as expected (a single vector with 3 numbers)?
+# Did this compute the sum of the two velocities as expected?
 # Answer:
 
 
@@ -57,11 +57,13 @@ total_robot_vel_magnitude = np.sqrt(total_robot_vel_np*total_robot_vel_np)
 # TODO: If it did not calculate the magnitude, fix the above line to correctly compute the magnitude.
 # total_robot_vel_magnitude = <your solution here>
 
+print('magnitude:', total_robot_vel_magnitude)
+
+# The key here is just using intermediate steps and debugging to know what you are doing.
+
 # ideas that might help:
 # - you could index into the array to access individual elements
 # - you could look for numpy functions that might help
 # - you could try to utilize python's built-in exponentiation operator **
 # - you could try to utilize python's built-in matrix multiplication operator @
-
-print('magnitude:', total_robot_vel_magnitude)
 

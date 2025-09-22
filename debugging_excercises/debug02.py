@@ -55,7 +55,8 @@ result = a + b
 # Answer:
 
 # TODO: fix the code so that you can successfully add them without changing the
-# original shapes (use numpy or matrix/vector operations).
+# original shapes (use numpy or matrix/vector operations rather than chaging the
+# numbers inside of the ones() function that define the shape).
 # The result should have 6 numbers, but it doesn't matter if the result is 2x3 or 3x2.
 
 
