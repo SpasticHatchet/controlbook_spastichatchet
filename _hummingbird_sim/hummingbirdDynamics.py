@@ -52,6 +52,8 @@ class HummingbirdDynamics:
             "ell_T": P.ellT * (1.+alpha*(2.*np.random.rand()-1.)),
             "d": P.d * (1.+alpha*(2.*np.random.rand()-1.)),
         }
+        self.km = P.km * (1.+alpha*(2.*np.random.rand()-1.))
+
         # TODO: add beta to param file or define it here
         # beta = 0.001
         self.B = #TODO define the friction-based matrix of coefficients
