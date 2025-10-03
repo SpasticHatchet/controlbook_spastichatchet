@@ -130,11 +130,11 @@ dP_dq =
 
 # Substitute out dynamic variables for prettier function generation
 dynamic_subs = {
-    theta: sp.Symbol("theta"),
     phi: sp.Symbol("phi"),
+    theta: sp.Symbol("theta"),
     psi: sp.Symbol("psi"),
-    q_dot[0]: sp.Symbol("thetadot"),
-    q_dot[1]: sp.Symbol("phidot"),
+    q_dot[0]: sp.Symbol("phidot"),
+    q_dot[1]: sp.Symbol("thetadot"),
     q_dot[2]: sp.Symbol("psidot"),
 }
 M = M.subs(dynamic_subs)
@@ -313,3 +313,4 @@ print(dP_dq_val, "\n")  # should be [[0], [0.0833], [0]]
 tau_val = eom.calculate_tau(x, u, **param_vals)
 print("tau_val:")
 print(tau_val, "\n")  # should be [[0.0012], [0.0833], [0]]
+
