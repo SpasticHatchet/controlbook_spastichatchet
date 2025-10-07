@@ -15,6 +15,8 @@
 # one file per lab assignment.
 from h2_generate_KE import *
 
+# p1_in_w = sp.Matrix([[ell_1*sp.cos(theta)*sp.cos(psi)],[ell_1*sp.cos(theta)*sp.sin(psi)],[-1*ell_1*sp.sin(theta)]])
+
 # %%
 # TODO:  define symbols needed for potential energy and the RHS (tau - B@q_dot)
 # of the equations of motion
@@ -114,7 +116,7 @@ printsym(dM_dpsi)
 
 # %%
 # TODO: calculate C
-C = (Mdot @ q_dot) - (half * sp.Matrix([[q_dot.T @ dM_dphi],[q_dot.T @ dM_dtheta],[q_dot @ dM_dpsi]]) @ q_dot)
+C = (Mdot @ q_dot) - (half * sp.Matrix([[q_dot.T @ dM_dphi],[q_dot.T @ dM_dtheta],[q_dot.T @ dM_dpsi]]) @ q_dot)
 
 # Print if you want, but the result is not shown in the lab manual to compare
 # printsym(C)
@@ -280,15 +282,15 @@ param_vals = {
     "m_1": P.m1,
     "m_2": P.m2,
     "m_3": P.m3,
-    "J_1x": P.J1x,
-    "J_1y": P.J1y,
-    "J_1z": P.J1z,
-    "J_2x": P.J2x,
-    "J_2y": P.J2y,
-    "J_2z": P.J2z,
-    "J_3x": P.J3x,
-    "J_3y": P.J3y,
-    "J_3z": P.J3z,
+    "J1_x": P.J1x,
+    "J1_y": P.J1y,
+    "J1_z": P.J1z,
+    "J2_x": P.J2x,
+    "J2_y": P.J2y,
+    "J2_z": P.J2z,
+    "J3_x": P.J3x,
+    "J3_y": P.J3y,
+    "J3_z": P.J3z,
     "ell_1": P.ell1,
     "ell_2": P.ell2,
     "ell_3x": P.ell3x,
@@ -323,3 +325,5 @@ tau_val = eom.calculate_tau(x, u, **param_vals)
 print("tau_val:")
 print(tau_val, "\n")  # should be [[0.0012], [0.0833], [0]]
 
+
+# %%

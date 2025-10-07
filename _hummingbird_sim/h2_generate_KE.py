@@ -59,13 +59,13 @@ p3_in_w = rotz(psi)@p3_in_1
 # TODO: take the time derivative of the position vectors to get the linear velocity,
 # then use the "find_coeffs" function to calculate the "V_i" matrices
 
-v1_in_w = sp.diff(p1_in_w)
+v1_in_w = p1_in_w.diff(t)
 V1 = find_coeffs(v1_in_w, q_dot)
 
-v2_in_w = sp.diff(p2_in_w)
+v2_in_w = p2_in_w.diff(t)
 V2 = find_coeffs(v2_in_w, q_dot)
 
-v3_in_w = sp.diff(p3_in_w)
+v3_in_w = p3_in_w.diff(t)
 V3 = find_coeffs(v3_in_w, q_dot)
 
 
