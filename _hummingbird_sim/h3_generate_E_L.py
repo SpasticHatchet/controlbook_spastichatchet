@@ -6,25 +6,29 @@ from sympy import sin, cos # import the sine and cosine functions
 # for potential energy (gravity)
 # TODO define symbols needed for the RHS of the equations of motion (g, beta, d, f_l, f_r, ell_T, km)
 
-
+g, beta, d, f_l, f_r, ell_T, km = sp.symbols('g, beta, d, f_l, f_r, ell_T, km')
 
 # TODO calculate the kinetic energy using the definition with the mass matrix "M"
 # and "q_dot"
-K =
+half = sp.Rational(1,2)
+K = half * q_dot.T @ M @ q_dot
 
 # then make sure to grab just the scalar part of the result
 K = K[0,0]
 
 # TODO now calculate the potential energy "P" and make sure it is also a scalar
-P =
-
+P = (m1*g*ell_1*sin(theta) +
+     m2*g*ell_2*sin(theta) +
+     m3*g*ell_3z)
 
 
 #%%
 # TODO now calculate and define tau, C, and dP/dq for the hummingbird based on the definitions in the lab manual
-tau =
+tau = sp.Matrix([[d*(f_l-f_r)],
+                 [ell_T*(f_l+f_r)*cos(phi)],
+                 [ell_T*(f_l+f_r)*cos(theta)*sin(phi) - d*(f_l-f_r)*sin(theta)]])
 
-C =
+C = 
 
 dP_dq =
 

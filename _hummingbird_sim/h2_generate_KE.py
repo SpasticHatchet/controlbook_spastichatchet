@@ -37,70 +37,75 @@ q_dot = q.diff(t)
 # TODO: define the position of each mass in body frame, then rotate
 # it into the world or inertial frame.
 
-# p1_in_b =
-# p1_in_w =
+p1_in_b = sp.Matrix([[ell_1],[0],[0]])
+p1_in_w = sp.Matrix([[ell_1*sp.cos(theta)*sp.cos(psi)],[ell_1*sp.cos(theta)*sp.sin(psi)],[-ell_1*sp.sin(theta)]])
 
-# p2_in_2 =
-# p2_in_w =
+p2_in_2 = sp.Matrix([[ell_2],[0],[0]])
+p2_in_w = rotz(psi)@roty(theta)@p2_in_2
 
-# p3_in_1 =
-# p3_in_w =
+p3_in_1 = sp.Matrix([[ell_3x], [ell_3y], [ell_3z]])
+p3_in_w = rotz(psi)@p3_in_1
 
 
 # %%
 # TODO: take the time derivative of the position vectors to get the linear velocity,
 # then use the "find_coeffs" function to calculate the "V_i" matrices
 
-# v1_in_w =
-# V1 =
+v1_in_w = sp.diff(p1_in_w)
+V1 = find_coeffs(v1_in_w, q_dot)
 
-# v2_in_w =
-# V2 =
+v2_in_w = sp.diff(p2_in_w)
+V2 = find_coeffs(v2_in_w, q_dot)
 
-# v3_in_w =
-# V3 =
+v3_in_w = sp.diff(p3_in_w)
+V3 = find_coeffs(v3_in_w, q_dot)
 
 
 # %%
 # TODO: use the "rotx", "roty", and "rotz" functions to calculate the rotation matrices
 # for each rigid body
 
-# R1 =  #rotation to body 1
-# R2 =  #rotation to body 2
-# R3 =  #rotation to body 3
+R1 =  rotz(psi)@roty(theta)@rotx(phi)
+R2 =  rotz(psi)@roty(theta)
+R3 =  rotz(psi)
 
 
 # %%
 # TODO: use the "calc_omega" function with the rotation matrices to calculate the
 # angular velocity of each rigid body
 
-# omega_1 =
-# omega_2 =
-# omega_3 =
+omega_1 = calc_omega(R1)
+omega_2 = calc_omega(R2)
+omega_3 = calc_omega(R3)
 
 
 # %%
 # TODO: use the "find_coeffs" function to calculate the "W_i" matrices
 
-# W1 =
-# W2 =
-# W3 =
+W1 = find_coeffs(omega_1, q_dot)
+W2 = find_coeffs(omega_2, q_dot)
+W3 = find_coeffs(omega_3, q_dot)
 
 
 # %%
 # TODO: define the inertia tensors for each rigid body
 
-# J1 = sp.zeros(3,3)
+J1z, J1y, J1x, J2z, J2y, J2x, J3z, J3y, J3x = sp.symbols('J1_z, J1_y, J1_x, J2_z, J2_y, J2_x, J3_z, J3_y, J3_x')
 
-# J2 = sp.zeros(3,3)
+J1 = sp.diag(J1x, J1y, J1z)
 
-# J3 = sp.zeros(3,3)
+J2 = sp.diag(J2x, J2y, J2z)
+
+J3 = sp.diag(J3x, J3y, J3z)
 
 
 # %%
 # TODO: calculate M using the masses and the V, W, R, and J matrices
 
-M = sp.zeros(3, 3)
+# M = sp.zeros(3, 3)
+M = (m1*V1.T@V1 + W1.T@R1@J1@R1.T@W1 + 
+     m2*V2.T@V2 + W2.T@R2@J2@R2.T@W2 + 
+     m3*V3.T@V3 + W3.T@R3@J3@R3.T@W3)
 # M = M +
 
 
