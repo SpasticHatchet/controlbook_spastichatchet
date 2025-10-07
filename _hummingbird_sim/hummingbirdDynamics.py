@@ -1,6 +1,6 @@
 import numpy as np
 import hummingbirdParam as P
-# import eom_generated as eom
+import eom_generated as eom
 
 # Use the following if you saved your generated EOM functions with dill
 # import dill
@@ -55,8 +55,8 @@ class HummingbirdDynamics:
         self.km = P.km * (1.+alpha*(2.*np.random.rand()-1.))
 
         # TODO: add beta to param file or define it here
-        # beta = 0.001
-        self.B = #TODO define the friction-based matrix of coefficients
+        beta = 0.001
+        self.B = beta * np.eye(3)
 
     def update(self, u):
         """
@@ -93,22 +93,22 @@ class HummingbirdDynamics:
 
     def calculate_M(self, state):
         # TODO: Fill in this function
-        # M = eom.calculate_M(state, **self.param_vals)
+        M = eom.calculate_M(state, **self.param_vals)
         return M
 
     def calculate_C(self, state):
         # TODO: Fill in this function
-        # C = eom.calculate_C(state, **self.param_vals)
+        C = eom.calculate_C(state, **self.param_vals)
         return C
 
     def calculate_dP_dq(self, state):
         # TODO: Fill in this function
-        # dP_dq = eom.calculate_dP_dq(state, **self.param_vals)
+        dP_dq = eom.calculate_dP_dq(state, **self.param_vals)
         return dP_dq
 
     def calculate_tau(self, state, u):
         # TODO: Fill in this function
-        # tau = eom.calculate_tau(state, u, **self.param_vals)
+        tau = eom.calculate_tau(state, u, **self.param_vals)
         return tau
     ############################################################################
 
@@ -122,17 +122,20 @@ class HummingbirdDynamics:
         Returns:
             xdot (6x1 array): state derivative
         """
+        q_dot = state[3:6]
         # TODO: call the functions to calculate M, C, dP_dq, and tau to
         # numerically evaluate them at the current point in time.
-        M = self.calculate_M()
-        C = self.calculate_C()
-        dP_dq = self.calculate_dP_dq()
-        tau = self.calculate_tau()
+        M = self.calculate_M(state)
+        C = self.calculate_C(state)
+        dP_dq = self.calculate_dP_dq(state)
+        tau = self.calculate_tau(state, u)
+        bqdot = self.B @ q_dot
 
         # TODO: write an expression for qddot from the lab manual equations,
         # remember that it will be in terms of M, C, dP_dq, -Bqdot, and tau
         # (but all of them will be numerical values, not functions)
-        qddot =
+        RHS = tau - bqdot - dP_dq - C
+        qddot = np.linalg.solve(M, RHS)
 
         # Pull out the first derivative (or velocity-based) terms from the state
         phidot = state[3, 0]
@@ -161,9 +164,9 @@ class HummingbirdDynamics:
             y (3x1 array): output vector [phi, theta, psi]
         """
         # TODO Fill in this function using self.state
-        phi =
-        theta =
-        psi =
+        phi = self.state[0]
+        theta = self.state[1]
+        psi = self.state[2]
         y = np.array([[phi], [theta], [psi]])
         return y
 

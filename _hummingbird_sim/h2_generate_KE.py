@@ -99,7 +99,7 @@ W3 = find_coeffs(omega_3, q_dot)
 # TODO: define symbols for the diagonal inertia terms then define the inertia
 # tensors for each rigid body
 
-J1z, J1y, J1x, J2z, J2y, J2x, J3z, J3y, J3x = sp.symbols('J1_z, J1_y, J1_x, J2_z, J2_y, J2_x, J3_z, J3_y, J3_x')
+J1z, J1y, J1x, J2z, J2y, J2x, J3z, J3y, J3x = sp.symbols('J_1z, J_1y, J_1x, J_2z, J_2y, J_2x, J_3z, J_3y, J_3x')
 
 J1 = sp.diag(J1x, J1y, J1z)
 
