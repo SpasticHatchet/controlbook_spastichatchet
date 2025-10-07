@@ -48,8 +48,6 @@ tau = sp.Matrix([[d*(f_l-f_r)],
                  [ell_T*(f_l+f_r)*sp.cos(phi)],
                  [ell_T*(f_l+f_r)*sp.cos(theta)*sp.sin(phi) - d*(f_l-f_r)*sp.sin(theta)]])
 
-# C = 
-
 printsym(tau)
 
 
@@ -59,7 +57,7 @@ printsym(tau)
 # terms of Mdot, dM/dphi, dM/dtheta, and dM/dpsi.
 # %%
 # TODO: calculate Mdot and verify with lab manual
-Mdot = # TODO
+Mdot = M.diff(t) # not sp.diff(M)?
 
 # Print longer terms separately like lab manual
 print_subs = {
@@ -99,24 +97,24 @@ printsym(Mdot33)
 # moving on and using numerical comparisons in the test_dynamics.py file.
 
 # %%
-dM_dphi = # TODO
+dM_dphi = M.diff(phi)
 dM_dphi = sp.simplify(dM_dphi)
 printsym(dM_dphi)
 
 # %%
-dM_dtheta = # TODO
+dM_dtheta = M.diff(theta)
 # substitute N33 just for printing to match the lab manual
 printsym(dM_dtheta.subs({dM_dtheta[2, 2]: sp.Symbol("N_33")}))
 N33 = sp.collect(dM_dtheta[2, 2], 2 * sp.sin(theta) * sp.cos(theta))
 printsym(N33)
 
 # %%
-dM_dpsi = # TODO
+dM_dpsi = M.diff(psi)
 printsym(dM_dpsi)
 
 # %%
 # TODO: calculate C
-C =
+C = (Mdot @ q_dot) - (half * sp.Matrix([[q_dot.T @ dM_dphi],[q_dot.T @ dM_dtheta],[q_dot @ dM_dpsi]]) @ q_dot)
 
 # Print if you want, but the result is not shown in the lab manual to compare
 # printsym(C)
@@ -125,7 +123,7 @@ C =
 # ### Partial Derivative of Potential Energy (dP/dq):
 # %%
 # TODO: calculate dP/dq
-dP_dq =
+dP_dq = P.diff(q)
 
 # Print if you want, but the result is not shown in the lab manual to compare
 # printsym(dP_dq)

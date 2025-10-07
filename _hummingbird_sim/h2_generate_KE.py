@@ -46,7 +46,7 @@ q_dot = q.diff(t)
 # it into the world or inertial frame.
 
 p1_in_b = sp.Matrix([[ell_1],[0],[0]])
-p1_in_w = sp.Matrix([[ell_1*sp.cos(theta)*sp.cos(psi)],[ell_1*sp.cos(theta)*sp.sin(psi)],[-ell_1*sp.sin(theta)]])
+p1_in_w = sp.Matrix([[ell_1*sp.cos(theta)*sp.cos(psi)],[ell_1*sp.cos(theta)*sp.sin(psi)],[-1*ell_1*sp.sin(theta)]])
 
 p2_in_2 = sp.Matrix([[ell_2],[0],[0]])
 p2_in_w = rotz(psi)@roty(theta)@p2_in_2
