@@ -28,10 +28,10 @@ display(Math(vlatex(full_eom)))
 # step 1 - substitute zero in for all the suggested variables
 
 zeroes_dict = {
-    sp.Symbol('phi') : 0,
-    sp.Symbol('phidot') : 0,
-    sp.Symbol('psidot') : 0,
-    sp.Symbol('psiddot') : 0
+    phi : 0,
+    phi.diff(t) : 0,
+    psi.diff(t) : 0,
+    psi.diff(t, 2) : 0
 }
 zeroes_eom = full_eom.subs(zeroes_dict)
 
@@ -42,9 +42,19 @@ display(Math(vlatex(zeroes_eom)))
 #%%
 
 # step 2 - substitute F and Tau for f_l, f_r, and d*(f_l-f_r)
+F = sp.symbols('F')
+# F_def = sp.Eq(F, f_l + f_r)
+
+F_def = {
+    f_l + f_r : F,
+    f_l - f_r : -F, #DOUBT DOUBT DOUBT
+}
+
+zeroes_eom_F = zeroes_eom.subs(f_l + f_r, F)
+
 
 display('Longitudinal Dynamics (step 2):')
-#display(Math(vlatex()))
+display(Math(vlatex(zeroes_eom_F)))
 #display(Math(vlatex()))
 
 #%%
