@@ -6,7 +6,13 @@ from sympy.physics.vector import vlatex
 #%%
 # TODO - calculate the full equations of motion for the hummingbird, you can do this
 # as a single equation = 0 (i.e. LHS - RHS), or you can treat each part individually and
-# do the calculations for LHS and RHS separately. 
+# do the calculations for LHS and RHS separately.
+
+# We don't yet have a matrix for Beta, so let's create that first.
+B = beta * sp.diag(1,1,1)
+
+full_eom = sp.simplify((M @ q_dot.diff(t)) + C + dP_dq - tau + (B @ q_dot))
+display(Math(vlatex(full_eom)))
 
 #%%[markdown]
 # Longitudinal Dynamics are derived in this section: 
@@ -21,8 +27,16 @@ from sympy.physics.vector import vlatex
 #%%
 # step 1 - substitute zero in for all the suggested variables
 
+zeroes_dict = {
+    sp.Symbol('phi') : 0,
+    sp.Symbol('phidot') : 0,
+    sp.Symbol('psidot') : 0,
+    sp.Symbol('psiddot') : 0
+}
+zeroes_eom = full_eom.subs(zeroes_dict)
+
 display('Longitudinal Dynamics (step 1):')
-#display(Math(vlatex()))
+display(Math(vlatex(zeroes_eom)))
 #display(Math(vlatex()))
 
 #%%

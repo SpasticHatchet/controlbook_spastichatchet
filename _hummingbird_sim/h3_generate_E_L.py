@@ -148,13 +148,13 @@ dynamic_subs = {
     q_dot[1]: sp.Symbol("thetadot"),
     q_dot[2]: sp.Symbol("psidot"),
 }
-M = M.subs(dynamic_subs)
-C = C.subs(dynamic_subs)
-dP_dq = dP_dq.subs(dynamic_subs)
-tau = tau.subs(dynamic_subs)
+M_sym = M.subs(dynamic_subs)
+C_sym = C.subs(dynamic_subs)
+dP_dq_sym = dP_dq.subs(dynamic_subs)
+tau_sym = tau.subs(dynamic_subs)
 
 # Define state and input vectors for function generation
-state = sp.Matrix([phi, theta, psi, q_dot[0], q_dot[1], q_dot[2]]).subs(dynamic_subs)
+state_sym = sp.Matrix([phi, theta, psi, q_dot[0], q_dot[1], q_dot[2]]).subs(dynamic_subs)
 u = sp.Matrix([f_l, f_r])
 
 # Create a list of all paramters needed for the functions
@@ -165,10 +165,10 @@ params = list(
 )
 
 # Generate functions using lambdify (*params unpacks the list into individual arguments)
-calc_M = sp.lambdify([state, *params], M, modules="numpy")
-calc_C = sp.lambdify([state, *params], C, modules="numpy")
-calc_dP_dq = sp.lambdify([state, *params], dP_dq, modules="numpy")
-calc_tau = sp.lambdify([state, u, *params], tau, modules="numpy")
+calc_M = sp.lambdify([state_sym, *params], M_sym, modules="numpy")
+calc_C = sp.lambdify([state_sym, *params], C_sym, modules="numpy")
+calc_dP_dq = sp.lambdify([state_sym, *params], dP_dq_sym, modules="numpy")
+calc_tau = sp.lambdify([state_sym, u, *params], tau_sym, modules="numpy")
 
 
 # %% Save functions for the EOM matrices
