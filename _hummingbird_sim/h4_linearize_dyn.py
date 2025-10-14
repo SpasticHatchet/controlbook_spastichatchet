@@ -11,8 +11,11 @@ from sympy.physics.vector import vlatex
 # We don't yet have a matrix for Beta, so let's create that first.
 B = beta * sp.diag(1,1,1)
 
+# J1x is being treated as time varying for some reason
 full_eom = sp.simplify((M @ q_dot.diff(t)) + C + dP_dq - tau + (B @ q_dot))
-display(Math(vlatex(full_eom)))
+#full_eom = sp.collect(g, full_eom)
+#printsym(M)
+#display(Math(vlatex(full_eom)))
 
 #%%[markdown]
 # Longitudinal Dynamics are derived in this section: 
@@ -20,7 +23,7 @@ display(Math(vlatex(full_eom)))
 #%%
 # step 0 - just print the equations for theta_ddot
 
-#display(Math(vlatex(sp.expand_trig(LHS[1]))))
+display(Math(vlatex(sp.expand_trig(full_eom))))
 #display(Math(vlatex(sp.expand_trig(RHS[1]))))
 
 
@@ -31,7 +34,8 @@ zeroes_dict = {
     phi : 0,
     phi.diff(t) : 0,
     psi.diff(t) : 0,
-    psi.diff(t, 2) : 0
+    psi.diff(t, 2) : 0,
+    J1x : 0
 }
 zeroes_eom = full_eom.subs(zeroes_dict)
 
@@ -42,25 +46,27 @@ display(Math(vlatex(zeroes_eom)))
 #%%
 
 # step 2 - substitute F and Tau for f_l, f_r, and d*(f_l-f_r)
-F = sp.symbols('F')
+F, tau2 = sp.symbols('F, tau')
 # F_def = sp.Eq(F, f_l + f_r)
 
-F_def = {
-    f_l + f_r : F,
-    f_l - f_r : -F, #DOUBT DOUBT DOUBT
-}
-
 zeroes_eom_F = zeroes_eom.subs(f_l + f_r, F)
-
+#zeroes_eom_d = sp.collect(f_l - f_r, zeroes_eom_F)
+zeroes_eom_d = zeroes_eom_F.subs(d*(f_l - f_r), tau2)
 
 display('Longitudinal Dynamics (step 2):')
-display(Math(vlatex(zeroes_eom_F)))
+display(Math(vlatex(zeroes_eom_d)))
 #display(Math(vlatex()))
 
 #%%
 # step 3 - find the feedback linearization force F_fl
 display('Feedback Linearization Force (step 3):')
 #display(Math(vlatex(F_fl)))
+F_ctrl = sp.symbols('F_control')
+
+#Set friction coefficient b to 0.
+lin_dyn_eom = zeroes_eom_d.subs(beta, 0)
+# Redefine the B matrix with this new b
+B = beta * sp.diag(1,1,1)
 
 #%%
 # step 4 - find the linearized equation of motion for theta_ddot

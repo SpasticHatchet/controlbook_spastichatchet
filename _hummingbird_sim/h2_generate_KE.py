@@ -111,11 +111,10 @@ J3 = sp.diag(J3x, J3y, J3z)
 # %%
 # TODO: calculate M using the masses and the V, W, R, and J matrices
 
-# M = sp.zeros(3, 3)
-M = (m1*V1.T@V1 + W1.T@R1@J1@R1.T@W1 + 
-     m2*V2.T@V2 + W2.T@R2@J2@R2.T@W2 + 
-     m3*V3.T@V3 + W3.T@R3@J3@R3.T@W3)
-# M = M +
+M = (m1 * V1.T @ V1 + W1.T @ R1 @ J1 @ R1.T @ W1 + 
+     m2 * V2.T @ V2 + W2.T @ R2 @ J2 @ R2.T @ W2 + 
+     m3 * V3.T @ V3 + W3.T @ R3 @ J3 @ R3.T @ W3)
+
 
 
 # %%
@@ -139,12 +138,12 @@ long_terms = {
     M[1, 2]: sp.Symbol("M_23"),
     M[2, 2]: sp.Symbol("M_33"),
 }
-printsym(M.subs(long_terms))
-print("M22:")
-printsym(M22)
-print("M23:")
-printsym(M23)
-print("M33:")
-printsym(M33)
+# printsym(M.subs(long_terms))
+# print("M22:")
+# printsym(M22)
+# print("M23:")
+# printsym(M23)
+# print("M33:")
+# printsym(M33)
 
 # %%

@@ -101,18 +101,18 @@ printsym(Mdot33)
 # %%
 dM_dphi = M.diff(phi)
 dM_dphi = sp.simplify(dM_dphi)
-printsym(dM_dphi)
+# printsym(dM_dphi)
 
 # %%
 dM_dtheta = M.diff(theta)
 # substitute N33 just for printing to match the lab manual
-printsym(dM_dtheta.subs({dM_dtheta[2, 2]: sp.Symbol("N_33")}))
+# printsym(dM_dtheta.subs({dM_dtheta[2, 2]: sp.Symbol("N_33")}))
 N33 = sp.collect(dM_dtheta[2, 2], 2 * sp.sin(theta) * sp.cos(theta))
-printsym(N33)
+# printsym(N33)
 
 # %%
 dM_dpsi = M.diff(psi)
-printsym(dM_dpsi)
+# printsym(dM_dpsi)
 
 # %%
 # TODO: calculate C
@@ -169,8 +169,6 @@ calc_M = sp.lambdify([state_sym, *params], M_sym, modules="numpy")
 calc_C = sp.lambdify([state_sym, *params], C_sym, modules="numpy")
 calc_dP_dq = sp.lambdify([state_sym, *params], dP_dq_sym, modules="numpy")
 calc_tau = sp.lambdify([state_sym, u, *params], tau_sym, modules="numpy")
-
-
 # %% Save functions for the EOM matrices
 
 # Method 1: using dill (blackbox method, saves binary files that are not human readable)
@@ -242,15 +240,15 @@ def save_generated_functions(filename = "eom_generated.py"):
     cur_file = os.path.split(__file__)[-1]
 
     # Comment out the if block if you always want to overwrite the exiting file
-    if os.path.exists(save_file):
-        print("(in VSCode, use command bar at the top of the window to input response)")
-        print(f"{filename} already exists...")
-        overwrite = input("Overwrite it? (y/n): ")
-        if not overwrite.lower() == "y":
-            print("Not overwriting.")
-            return
-        else:
-            print("Overwriting now...")
+    # if os.path.exists(save_file):
+    #     print("(in VSCode, use command bar at the top of the window to input response)")
+    #     print(f"{filename} already exists...")
+    #     overwrite = input("Overwrite it? (y/n): ")
+    #     if not overwrite.lower() == "y":
+    #         print("Not overwriting.")
+    #         return
+    #     else:
+    #         print("Overwriting now...")
 
     with open(save_file, "w") as f:
         f.write("#" * 80 + "\n")
@@ -310,20 +308,20 @@ np.set_printoptions(precision=4, suppress=True)
 # become individual arguments in the function call and the order doesn't matter.
 
 M_val = eom.calculate_M(x, **param_vals)
-print("M_val:")
-print(M_val, "\n")  # should be np.diag([0.0002, 0.0126, 0.0127])
+# print("M_val:")
+# print(M_val, "\n")  # should be np.diag([0.0002, 0.0126, 0.0127])
 
 C_val = eom.calculate_C(x, **param_vals)
-print("C_val:")
-print(C_val, "\n")  # should be all zeros
+# print("C_val:")
+# print(C_val, "\n")  # should be all zeros
 
 dP_dq_val = eom.calculate_dP_dq(x, **param_vals)
-print("dP_dq_val:")
-print(dP_dq_val, "\n")  # should be [[0], [0.0833], [0]]
+# print("dP_dq_val:")
+# print(dP_dq_val, "\n")  # should be [[0], [0.0833], [0]]
 
 tau_val = eom.calculate_tau(x, u, **param_vals)
-print("tau_val:")
-print(tau_val, "\n")  # should be [[0.0012], [0.0833], [0]]
+# print("tau_val:")
+# print(tau_val, "\n")  # should be [[0.0012], [0.0833], [0]]
 
 
 # %%
