@@ -65,11 +65,16 @@ class HummingbirdDynamics:
 
         Args:
             u (2x1 numpy array): input vector [f_l, f_r]
+            Lab 3, u is the duty cycles for the left and right motors
+            They are converted to forces by multiplying by km, which will be tuned experimentally
         Returns:
             y (3x1 numpy array): output vector [phi, theta, psi]
         """
-        u = saturate(u, P.torque_max)  # saturate the input force
-        self.rk4_step(u)  # propagate the state by one time sample
+        # Convert duty cycles to forces
+        U_f = P.km*u
+
+        U_f = saturate(U_f, P.torque_max)  # saturate the input force
+        self.rk4_step(U_f)  # propagate the state by one time sample
         y = self.h()  # return the corresponding output
         return y
 

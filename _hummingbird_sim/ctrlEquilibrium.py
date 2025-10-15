@@ -2,15 +2,14 @@ import numpy as np
 import hummingbirdParam as P
 
 class ctrlEquilibrium:
-    def update(self, x):
-        force_equilibrium =
+    def update(self):
+        force_equilibrium = (P.g * ((P.m1 * P.ell1) + (P.m2 * P.ell2))) / P.ellT
         force = force_equilibrium
         torque = 0.
         # convert force and torque to pwm signals
-        pwm =
+        pwm = P.mixing @ np.array([[force], [torque]]) / P.km
         pwm = saturate(pwm, 0, 1)
         return pwm
-
 
 def saturate(u, low_limit, up_limit):
     if isinstance(u, float) is True:

@@ -199,6 +199,4 @@ display(Math(vlatex(sp.simplify(B_mat))))
 # you can linearize them like we have shown in the case studies using the 
 # "jacobian" function, and substituting equilibrium values in. 
 
-
-
 # %%
