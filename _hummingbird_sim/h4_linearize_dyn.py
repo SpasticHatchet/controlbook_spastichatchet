@@ -11,7 +11,7 @@ from sympy.physics.vector import vlatex
 # We don't yet have a matrix for Beta, so let's create that first.
 B = beta * sp.diag(1,1,1)
 
-display(Math(vlatex(tau)))
+#display(Math(vlatex(tau)))
 
 
 RHS = tau - (B @ q_dot)
@@ -54,8 +54,6 @@ F, tau2 = sp.symbols('F, tau')
 
 zeroes_eom_F = zeroes_eom.subs(f_l + f_r, F)
 zeroes_eom_d = zeroes_eom_F.subs(d*(f_l - f_r), tau2)
-#zeroes_eom_F_os = zeroes_eom_os.subs(f_l + f_r, F)
-#zeroes_eom_d_os = zeroes_eom_F_os.subs(d*(f_l - f_r), tau2)
 
 display('Longitudinal Dynamics (step 2):')
 display(Math(vlatex(zeroes_eom_d)))
@@ -73,7 +71,7 @@ nonlinear = zeroes_eom_d.subs(linear_zeroes)
 
 F_fl = sp.solve(nonlinear, F)[0]
 display(Math(vlatex(sp.Eq(sp.symbols('F_fl'), F_fl))))
-#display(Math(vlatex(nonlinear)))
+
 
 #%%
 # step 4 - find the linearized equation of motion for theta_ddot

@@ -44,9 +44,13 @@ J = diag(0, m1*ell**2/12.0, m1*ell**2/12.0)
 
 
 #%%
-K = simplify(0.5*m1*v1.T@v1 + 0.5*m2*v2.T@v2 + 0.5*omega.T@R@J@R.T@omega)
+K = sp.simplify(0.5*m1*v1.T@v1 + 0.5*m2*v2.T@v2 + 0.5*omega.T@R@J@R.T@omega)
 
-# just grabbing the scalar inside this matrix so that we can do L = K-P, since P is a scalar
+half = sp.Rational(1, 2)
+K_2 = sp.simplify(half * m2 * v2.T @ v2)
+display('Kinetic Energy of mass 2:')
+display(Math(vlatex(K_2[0,0])))
+# just  grabbing the scalar inside this matrix so that we can do L = K-P, since P is a scalar
 K = K[0,0]
 
 

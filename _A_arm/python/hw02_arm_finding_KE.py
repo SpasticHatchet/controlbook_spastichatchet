@@ -84,6 +84,8 @@ J = sp.diag(0, c * m * ell**2, c * m * ell**2)
 # Calculate the kinetic energy
 # K = 1/2*m*v.T @ v + 1/2*omega.T @ R @ J @ R.T @ omega
 K = half * m * v.T @ v + half * omega.T @ R @ J @ R.T @ omega
+#temp = half * 
+#printsym(temp)
 K = K[0, 0]
 K = sp.trigsimp(K)
 
