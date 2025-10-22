@@ -5,11 +5,17 @@ from signalGenerator import signalGenerator
 from massAnimation import massAnimation
 from dataPlotter import dataPlotter
 from massDynamics import massDynamics
-from massController_PD import massController_PD
+#from massController_PD import massController_PD
+#from ctrlPDhw6 import ctrlPD
+from ctrlPD import ctrlPD
 
-massCtrl = massController_PD()
 massDyn = massDynamics()
-z_disp = signalGenerator(amplitude = 1, frequency = 0.01)
+massCtrl = ctrlPD()
+
+
+#period = 12
+
+z_disp = signalGenerator(amplitude = 1, frequency = 0.04)
 
 # instantiate the simulation plots and animation
 dataPlot = dataPlotter()
