@@ -48,8 +48,9 @@ class ctrlPD:
 
         # compute gains
         #a = wn_z**2*np.sqrt(2.0*P.length/3.0/P.g)-2.0*zeta_z*wn_z
-        self.kd_z = (2.0 * zeta_z * wn_z) / b0_z
         self.kp_z = (wn_z**2 + a0_z) / b0_z
+        self.kd_z = (2.0 * zeta_z * wn_z) / b0_z
+        
 
         # print control gains to terminal        
         print('DC_gain', DC_gain_th)
@@ -61,7 +62,7 @@ class ctrlPD:
         #---------------------------------------------------
         #                    zero canceling filter
         #---------------------------------------------------
-        self.filter = zeroCancelingFilter(DC_gain_th)
+        # self.filter = zeroCancelingFilter(DC_gain_th)
 
     def update(self, z_r, state):
         z = state[0, 0]
@@ -71,16 +72,14 @@ class ctrlPD:
 
         # the reference angle for theta comes from the
         # outer loop PD control
-        tmp = self.kp_z * (z_r - z) - self.kd_z * zdot
-
-        # low pass filter the outer loop to cancel
-        # left-half plane zero and DC-gain
-        theta_r = self.filter.update(tmp)
+        theta_r = self.kp_z * (z_r - z) - self.kd_z * zdot
 
         # the force applied to the cart comes from the
         # inner loop PD control
         F = self.kp_th * (theta_r - theta) - self.kd_th * thetadot
-        F_sat = saturate(F, P.F_max)
+        Fe = (P.g / P.length) * (P.m2 * (P.length / 2.0) + P.m1*z) * np.cos(theta)
+        F_total = F + Fe
+        F_sat = F_total #saturate(F_total, P.F_max)
 
         return F_sat
     
@@ -88,15 +87,3 @@ def saturate(u, limit):
     if abs(u) > limit:
         u = limit * np.sign(u)
     return u
-
-
-class zeroCancelingFilter:
-    def __init__(self, DC_gain):
-        self.a = -3.0 / (2.0 * P.length * DC_gain)
-        self.b = np.sqrt(3.0 * P.g / (2.0 * P.length))
-        self.state = 0.0
-
-    def update(self, input):
-        # integrate using RK1
-        self.state = self.state + P.Ts * (-self.b * self.state + self.a * input)
-        return self.state

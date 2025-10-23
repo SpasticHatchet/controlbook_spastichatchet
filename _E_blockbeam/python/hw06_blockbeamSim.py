@@ -19,9 +19,6 @@ animation = blockbeamAnimation()
 t = P.t_start  # time starts at t_start
 y = blockbeam.h()  # output of system at start of simulation
 
-# for part e), we can uncomment below
-# blockbeam.state[1,0] = 10.0*np.pi/180.0
-
 while t < P.t_end:  # main simulation loop
     # Propagate dynamics in between plot samples
     t_next_plot = t + P.t_plot
