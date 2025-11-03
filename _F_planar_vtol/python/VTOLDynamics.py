@@ -1,4 +1,4 @@
-import numpy as np 
+import numpy as np
 import VTOLParam as P
 
 
@@ -49,9 +49,9 @@ class Dynamics:
         zdot = state[3][0]
         hdot = state[4][0]
         thetadot = state[5][0]
-        fl = u[0][0]
-        fr = u[1][0]
-        
+        fr = u[0][0]
+        fl = u[1][0]
+
         # The equations of motion.
         zddot = (-(fr + fl) * np.sin(theta) + -self.mu * zdot + self.F_wind) / (self.mc + 2.0 * self.mr)
         hddot = (-(self.mc + 2.0 * self.mr) * P.g + (fr + fl) * np.cos(theta)) / (self.mc + 2.0 * self.mr)

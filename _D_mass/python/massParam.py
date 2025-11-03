@@ -2,8 +2,8 @@
 import numpy as np
 
 # Physical parameters of the arm known to the controller
-m = 5  # mass kg
-k = 3  # spring constant Kg/s^2
+m = 5.0  # mass kg
+k = 3.0  # spring constant Kg/s^2
 b = 0.5  # damping coefficient Kg/s
 
 # parameters for animation
@@ -11,18 +11,28 @@ length = 5.0
 width = 1.0
 
 # Initial Conditions
-z0 = 0  # initial position of mass, m
-zdot0 = 0  # initial velocity of mass m/s
+z0 = 0.0  # initial position of mass, m
+zdot0 = 0.0  # initial velocity of mass m/s
 
 # Simulation Parameters
-t_start = 0 # Start time of simulation
-t_end = 10  # End time of simulation
+t_start = 0.0  # Start time of simulation
+t_end = 50.0  # End time of simulation
 Ts = 0.01  # sample time for simulation
-t_plot = 0.1 # the plotting and animation is updated at this rate
+t_plot = 0.033  # the plotting and animation is updated at this rate
 
 # dirty derivative parameters
-# sigma =  # cutoff freq for dirty derivative
+sigma = 0.05  # cutoff freq for dirty derivative
+beta = (2.0*sigma-Ts)/(2.0*sigma+Ts)  # dirty derivative gain
 
 # saturation limits
-F_max = 6  # Max force, N
+F_max = 6.0  # Max force, N
 
+# State space matrices
+# xdot = Ax + Bu
+# y = Cx + Du
+Amat = np.matrix([[ 0,       1      ],
+                  [ -k/m,    -b/m   ]])
+Bmat = np.matrix([[ 0   ],
+                  [ 1/m ]])
+Cmat = np.matrix([[1, 0]])
+Dmat = np.matrix([[0]])
