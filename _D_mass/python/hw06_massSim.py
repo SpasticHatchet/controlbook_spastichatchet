@@ -12,10 +12,9 @@ from ctrlPD import ctrlPD
 massDyn = massDynamics()
 massCtrl = ctrlPD()
 
+period = 16
 
-#period = 12
-
-z_disp = signalGenerator(amplitude = 1, frequency = 0.04)
+z_disp = signalGenerator(amplitude = 0.5, frequency = 1 / period)
 
 # instantiate the simulation plots and animation
 dataPlot = dataPlotter()
@@ -27,7 +26,7 @@ while t < P.t_end: # main simulation loop
     t_next_plot = t + P.t_plot
     while t < t_next_plot: # updates control and dynamics at faster simulation rate
         
-        r = z_disp.square(t)
+        r = z_disp.square(t) + 0.5
         u = massCtrl.update(r, massDyn.state)
         y = massDyn.update(u) # Propagate the dynamics
 

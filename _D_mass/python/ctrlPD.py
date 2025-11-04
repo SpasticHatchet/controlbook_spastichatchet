@@ -6,7 +6,7 @@ import massParam as P
 class ctrlPD:
     def __init__(self):
         #  tuning parameters
-        tr = 2 # tuned for faster rise time before saturation.
+        tr = 1.64 # tuned for faster rise time before saturation.
         zeta = 0.7
 
         # desired natural frequency
@@ -21,6 +21,7 @@ class ctrlPD:
         self.Kd = (alpha1 - a1) / b0
         self.Kp = (alpha0 - a0) / b0
 
+        # D.7d
         # self.Kd = 4.5
         # self.Kp = 12.0
 
