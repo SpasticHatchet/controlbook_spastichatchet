@@ -30,6 +30,7 @@ class ctrlStateFeedback:
             print("The system is not controllable")
         else:
             self.K = cnt.place(A, B, des_poles)
+            print(self.K)
             self.kr = -1.0 / (C @ np.linalg.inv(A - B @ self.K) @ B)
         print('K: ', self.K)
         print('kr: ', self.kr)

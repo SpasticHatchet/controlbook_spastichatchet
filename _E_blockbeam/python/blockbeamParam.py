@@ -30,3 +30,17 @@ F_max = 15.0  # Max Force, N
 # equilibrium force when block is in center of beam
 ze = length/2.0
 Fe = m1*g*z0/length + m2*g/2.0
+
+# State space matrices
+# Q is a placeholder for a big ugly constant
+Q1 = (-m1 * g) / (((m2 * length**2)/3) + (m1 * ze**2))
+Amat = np.matrix([[ 0,   0,   1,   0   ],
+                  [ 0,   0,   0,   1   ],
+                  [ 0,  -g,   0,   0   ],
+                  [ Q1,  0,   0,   0   ]])
+Q2 = length / (((m2 * length**2)/3) + (m1 * ze**2))
+Bmat = np.matrix([0, 0, 0, Q2]).T
+Cmat = np.matrix([[ 1,  0,  0,  0   ],
+                  [ 0,  1,  0,  0   ]])
+Dmat = np.matrix([[ 0   ],
+                  [ 0   ]])

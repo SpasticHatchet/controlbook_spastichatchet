@@ -15,7 +15,8 @@ print(P.Bmat)
 print(P.Amat @ P.Bmat)
 print(ctrlMat)
 print(n)
-print(rank)# %%
+print(rank)
+# %%
 
 b = P.b
 k = P.k
