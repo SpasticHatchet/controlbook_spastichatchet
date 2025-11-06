@@ -2,7 +2,7 @@ import numpy as np
 import VTOLParam as P
 
 
-class Dynamics:
+class VTOLDynamics:
     def __init__(self, alpha = 0.0):
         # Initial state conditions
         self.state = np.array([

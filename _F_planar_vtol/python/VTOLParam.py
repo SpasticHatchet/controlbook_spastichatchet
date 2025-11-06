@@ -38,15 +38,22 @@ mixing = np.linalg.inv(unmixing) # converts force and torque (FT) to fr and fl (
 # equilibrium force
 Fe = (mc + 2.0 * mr) * g
 
-Amat = np.matrix([[0.0, 0.0, 1.0, 0.0],
-                  [0.0, 0.0, 0.0, 1.0],
-                  [0.0, -Fe / (mc + 2.0 * mr), -mu / (mc + 2.0 * mr), 0.0],
-                  [0.0, 0.0, 0.0, 0.0]])
-Bmat = np.matrix([[0.0],
-                  [0.0],
-                  [0.0],
-                  [1/(Jc+2.0*mr*d**2)]])
-Cmat = np.matrix([[1.0, 0.0, 0.0, 0.0],
-                  [0.0, 1.0, 0.0, 0.0]])
-Dmat = np.matrix([[0.0],
-                  [0.0]])
+Amat_lat = np.matrix([  [0.0, 0.0, 1.0, 0.0],
+                        [0.0, 0.0, 0.0, 1.0],
+                        [0.0, -Fe / (mc + 2.0 * mr), -mu / (mc + 2.0 * mr), 0.0],
+                        [0.0, 0.0, 0.0, 0.0]])
+Bmat_lat = np.matrix([  [0.0],
+                        [0.0],
+                        [0.0],
+                        [1/(Jc+2.0*mr*d**2)]])
+Cmat_lat = np.matrix([  [1.0, 0.0, 0.0, 0.0],
+                        [0.0, 1.0, 0.0, 0.0]])
+Dmat_lat = np.matrix([  [0.0],
+                        [0.0]])
+
+Amat_lon = np.matrix([[0, 1],
+                      [0, 0]])
+Bmat_lon = np.matrix([[0],
+                      [1 / (mc + 2 * mr)]])
+Cmat_lon = np.matrix([[1, 0]])
+Dmat_lon = np.matrix([[0]])

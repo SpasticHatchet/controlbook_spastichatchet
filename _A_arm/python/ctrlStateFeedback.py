@@ -49,7 +49,6 @@ class ctrlStateFeedback:
 
         return tau
 
-
 def saturate(u, limit):
     if abs(u) > limit:
         u = limit * np.sign(u)

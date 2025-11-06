@@ -1,14 +1,14 @@
 import matplotlib.pyplot as plt
 import blockbeamParam as P
-from blockbeamDynamics import blockbeamDynamics
-from ctrlPID import ctrlPID
 from signalGenerator import signalGenerator
 from blockbeamAnimation import blockbeamAnimation
 from dataPlotter import dataPlotter
+from blockbeamDynamics import blockbeamDynamics
+from ctrlStateFeedback import ctrlStateFeedback
 
 # instantiate blockbeam, controller, and reference classes
-blockbeam = blockbeamDynamics(alpha=0.20)
-controller = ctrlPID()
+blockbeam = blockbeamDynamics(alpha=0)
+controller = ctrlStateFeedback()
 reference = signalGenerator(amplitude=0.125, frequency=0.02, y_offset=0.25)
 
 # instantiate the simulation plots and animation
@@ -22,10 +22,10 @@ while t < P.t_end:  # main simulation loop
     # Propagate dynamics in between plot samples
     t_next_plot = t + P.t_plot
 
-    while t < t_next_plot:  # updates control and dynamics at faster simulation rate
-        r = reference.square(t)  # reference input
-        u = controller.update(r, y)  # update controller
-        y = blockbeam.update(u)  # propagate system, "d" is a disturbance used in future assignments
+    while t < t_next_plot: 
+        r = reference.square(t)
+        u = controller.update(r, blockbeam.state)  # update controller
+        y = blockbeam.update(u)  # propagate system
         t += P.Ts  # advance time by Ts
 
     # update animation and data plots
