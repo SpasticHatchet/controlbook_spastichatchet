@@ -2,7 +2,7 @@ import numpy as np
 import hummingbirdParam as P
 
 
-class ctrlLonPID:
+class ctrlLonPD:
     def __init__(self):
         # tuning parameters
         tr_pitch = 1.0
@@ -13,7 +13,7 @@ class ctrlLonPID:
         #print('b_theta: ', b_theta)
         wn_pitch = 2.2 / tr_pitch
         self.kp_pitch = wn_pitch**2 / b_theta
-        self.kd_pitch = 2 * zeta_pitch * wn_pitch * b_theta
+        self.kd_pitch = 2 * zeta_pitch * wn_pitch / b_theta
         # print gains to terminal
         print('kp_pitch: ', self.kp_pitch)
         print('ki_pitch: ', self.ki_pitch)
@@ -21,8 +21,8 @@ class ctrlLonPID:
         # sample rate of the controller
         self.Ts = P.Ts
         # dirty derivative parameters
-        sigma = 0.05  # cutoff freq for dirty derivative
-        self.beta = (2 * sigma - self.Ts) / (2 * sigma + self.Ts)
+        self.sigma = 0.05  # cutoff freq for dirty derivative
+        self.beta = (2 * self.sigma - self.Ts) / (2 * self.sigma + self.Ts)
         # delayed variables
         self.theta_d1 = 0.
         self.theta_dot = 0.
@@ -32,20 +32,20 @@ class ctrlLonPID:
     def update(self, r: np.ndarray, y: np.ndarray):
         theta_ref = r[0, 0]
         theta = y[1, 0]
-        force_fl = (P.m1 * P.ell1 + P.m2 * P.ell2) * (P.g / P.ellT) * np.cos(theta)  # feedforward force
+        force_fl = (P.m1 * P.ell1 + P.m2 * P.ell2) * P.g / P.ellT * np.cos(theta)  # feedforward force
         # compute errors
         error_theta = theta_ref - theta
         # update differentiators
-        self.theta_dot = (((2 * self.sigma - self.Ts) / (2 * self.sigma + self.Ts)) 
-                          * self.theta_dot + 2.0 / (2.0 * self.sigma + self.Ts) * (error_theta - self.error_theta_d1))
+        self.theta_dot = (self.beta * self.theta_dot + 
+                          ((2.0 / (2.0 * self.sigma + self.Ts)) * (theta - self.theta_d1)))#(error_theta - self.error_theta_d1)))
         # differentiate error
         # self.error_theta_dot = self.beta * self.error_theta_dot + (1-self.beta)/self.Ts * (error_theta - self.error_theta_d1)     
         # update integrators
         self.integrator_theta = 0.0
         
         # pitch control
-        force_unsat = error_theta * self.kp_pitch + self.theta_dot * self.kd_pitch + force_fl
-        force = saturate(force_unsat, -P.force_max, P.force_max)
+        force_unsat = error_theta * self.kp_pitch - self.theta_dot * self.kd_pitch + force_fl
+        force = saturate(force_unsat[0], -P.force_max, P.force_max)
         torque = 0.
         # convert force and torque to pwm signals
         pwm = np.array([[force + torque / P.d],               # u_left
@@ -71,7 +71,3 @@ def saturate(u, low_limit, up_limit):
             if u[i, 0] < low_limit:
                 u[i, 0] = low_limit
     return u
-
-
-
-
