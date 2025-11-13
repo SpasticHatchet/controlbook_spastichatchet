@@ -59,6 +59,7 @@ class ctrlStateFeedbackIntegrator:
         K1 = cnt.place(A1, B1, des_poles)
         self.K = K1[0, 0:4]
         self.Ki = K1[0, 4]
+        print("K1: ",K1)
         print("K: ",self.K)
         print("Ki: ",self.Ki)
 

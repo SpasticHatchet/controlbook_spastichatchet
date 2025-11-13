@@ -4,11 +4,11 @@ import VTOLParam as P
 from signalGenerator import signalGenerator
 from VTOLAnimation import VTOLAnimation
 from dataPlotter import dataPlotter
-from VTOLDynamics import Dynamics
+from VTOLDynamics import VTOLDynamics
 from ctrlStateFeedbackIntegrator import ctrlStateFeedbackIntegrator
 
 # instantiate VTOL, controller, and reference classes
-VTOL = Dynamics()
+VTOL = VTOLDynamics(alpha=0.20)
 controller = ctrlStateFeedbackIntegrator()
 z_reference = signalGenerator(amplitude=4.0, frequency=0.02, y_offset=5.0)
 h_reference = signalGenerator(amplitude=3.0, frequency=0.03, y_offset=5.0)
@@ -27,7 +27,7 @@ while t < P.t_end:  # main simulation loop
         h_ref = h_reference.square(t)
         z_ref = z_reference.square(t)
         r = np.array([[z_ref], [h_ref]])  # reference input
-        d = np.array([[0.0], [0.0]])  # input disturbance
+        d = np.array([[0.1], [0.0]])  # input disturbance
         n = np.array([[0.0], [0.0], [0.0]])  # simulate sensor noise
         x = VTOL.state
         u = controller.update(r, x)  # update controller
