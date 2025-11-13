@@ -4,12 +4,12 @@ import VTOLParam as P
 from signalGenerator import signalGenerator
 from VTOLAnimation import VTOLAnimation
 from dataPlotter import dataPlotter
-from VTOLDynamics import VTOLDynamics
-from ctrlStateFeedback import ctrlStateFeedback
+from VTOLDynamics import Dynamics
+from ctrlStateFeedbackIntegrator import ctrlStateFeedbackIntegrator
 
 # instantiate VTOL, controller, and reference classes
-VTOL = VTOLDynamics()
-controller = ctrlStateFeedback()
+VTOL = Dynamics()
+controller = ctrlStateFeedbackIntegrator()
 z_reference = signalGenerator(amplitude=4.0, frequency=0.02, y_offset=5.0)
 h_reference = signalGenerator(amplitude=3.0, frequency=0.03, y_offset=5.0)
 

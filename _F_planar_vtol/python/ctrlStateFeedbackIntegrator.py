@@ -1,3 +1,4 @@
+
 import numpy as np
 import control as cnt
 import VTOLParam as P
@@ -5,9 +6,12 @@ import VTOLParam as P
 class ctrlStateFeedback:
     def __init__(self):
 
+        self.Pi_lon = -1.0
+        self.Pi_lat = -1.0
+
         self.F_max = P.F_max
 
-        self.Fe = (P.mc + 2.0 * P.mr) * P.g  # equilibrium force 
+        # self.Fe = (P.mc + 2.0 * P.mr) * P.g  # equilibrium force 
 
         tr_z = 2.0
         omegan_z = 2.2 / tr_z
@@ -23,38 +27,53 @@ class ctrlStateFeedback:
 
         A_lon = P.Amat_lon
         B_lon = P.Bmat_lon
-        C_lon = P.Cmat_lon
+        C_lon = P.Cmat_lon[0]
         D_lon = P.Dmat_lon
         A_lat = P.Amat_lat
         B_lat = P.Bmat_lat
-        C_lat = P.Cmat_lat
+        C_lat = P.Cmat_lat[0]
         D_lat = P.Dmat_lat
 
+        A1_lon = np.vstack((np.hstack((A_lon, np.zeros((A_lon.shape[0],1)))),
+                            np.hstack((-C_lon, np.array([[0.0]])))))
+        B1_lon = np.vstack((B_lon, np.array([[0.0]])))
+        C1_lon = np.hstack((C_lon, np.array([[0.0]])))
+
+        A1_lat = np.vstack((np.hstack((A_lat, np.zeros((A_lat.shape[0],1)))),
+                            np.hstack((-C_lat, np.array([[0.0]])))))
+        B1_lat = np.vstack((B_lat, np.array([[0.0]])))
+        C1_lat = np.hstack((C_lat, np.array([[0.0]])))
+
         # gain calculation
-        des_char_poly_lon = [1.0, 2.0 * zeta_h * omegan_h, omegan_h ** 2]
+        des_char_poly_lon = np.convolve([1.0, 2.0 * zeta_h * omegan_h, omegan_h ** 2],
+                                        [1.0, -self.Pi_lon])
         des_poles_lon = np.roots(des_char_poly_lon)
-        des_char_poly_lat = np.convolve([1.0, 2.0 * zeta_z * omegan_z, omegan_z ** 2],
-                                        [1.0, 2.0 * zeta_th * omegan_th, omegan_th ** 2])
+        des_char_poly_lat = np.convolve( np.convolve([1.0, 2.0 * zeta_z * omegan_z, omegan_z ** 2],
+                                        [1.0, 2.0 * zeta_th * omegan_th, omegan_th ** 2]),
+                                        [1.0, -self.Pi_lat])
         des_poles_lat = np.roots(des_char_poly_lat)
         
         # Compute the gains if the system is controllable
         if np.linalg.matrix_rank(cnt.ctrb(A_lon, B_lon)) != A_lon.shape[0]:
             print("The longitudinal system is not controllable")
         else:
-            self.K_lon = cnt.place(A_lon, B_lon, des_poles_lon)
-            self.kr_lon = -1.0 / (C_lon @ np.linalg.inv(A_lon - B_lon @ self.K_lon) @ B_lon)
+            K1_lon = cnt.place(A_lon, B_lon, des_poles_lon)
+            self.K_lon = K1_lon[0:2]
+            self.Ki_lon = K1_lon[0, 2]
+        #     self.kr_lon = -1.0 / (C_lon @ np.linalg.inv(A_lon - B_lon @ self.K_lon) @ B_lon)
         
         if np.linalg.matrix_rank(cnt.ctrb(A_lat, B_lat)) != A_lat.shape[0]:
             print("The lateral system is not controllable")
         else:
-            self.K_lat = cnt.place(A_lat, B_lat, des_poles_lat)
-            Cr_lat = np.array([[1.0, 0.0, 0.0, 0.0]])
-            self.kr_lat = -1.0 / (Cr_lat @ np.linalg.inv(A_lat - B_lat @ self.K_lat) @ B_lat)
+            K1_lat = cnt.place(A_lat, B_lat, des_poles_lat)
+            self.K_lat = K1_lat[0:4]
+            self.Ki_lat = K1_lat[0, 4]
+        #     self.kr_lat = -1.0 / (Cr_lat @ np.linalg.inv(A_lat - B_lat @ self.K_lat) @ B_lat)
 
         print('K_lon: ', self.K_lon)
-        print('kr_lon: ', self.kr_lon)
+        print('Ki_lon: ', self.Ki_lon)
         print('K_lat: ', self.K_lat)
-        print('kr_lat: ', self.kr_lat)
+        print('Ki_lat: ', self.Ki_lat)
 
     def update(self, r, x):
         z_r = r[0,0]

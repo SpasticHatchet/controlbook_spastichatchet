@@ -26,9 +26,9 @@ class ctrlStateFeedback:
 
         des_poles = np.roots(des_char_poly)
 
-        C_AB = cnt.ctrb(P.Amat, P.Bmat)
+        C_AB = cnt.ctrb(A, B)
 
-        n = np.size(P.Amat, 1)
+        n = np.size(A, 1)
         rank = np.linalg.matrix_rank(C_AB)
         detC_AB = np.linalg.det(C_AB)
         #%% 
@@ -36,31 +36,28 @@ class ctrlStateFeedback:
         # print(rank)
         # print(detC_AB)
 
-        self.K = cnt.place(P.Amat, P.Bmat, des_poles)
-        print("K:")
-        print(self.K)
+        self.K = cnt.place(A, B, des_poles)
+        print("K:", self.K)
 
-        A_BK = P.Amat - P.Bmat @ self.K
-        self.Kr = -1.0 / (P.Cmat[0] @ np.linalg.inv(A_BK) @ P.Bmat)
+        A_BK = A - B @ self.K
+        self.Kr = -1.0 / (C @ np.linalg.inv(A_BK) @ B)
 
-        print("Kr:")
-        print(self.Kr)
+        print("Kr:", self.Kr)
         # %%
 
+    
     def update(self, z_r, x):
-        z = x[0, 0]
-        theta = x[1, 0]
+        z = x[0,0]
+        x_tilde = x - np.array([[P.ze], [0], [0], [0]])
+        zr_tilde = z_r - P.ze   # P.ze is the same as C_r*x_e 
 
-        # compute feedback linearizing force F_fl
-        # This cancels the gravity terms in the thetaddot equation
-        F_fl = (P.m1 * P.g * z + P.m2 * P.g * P.length / 2.0) / P.length
+        # equilibrium force
+        F_e = P.m1*P.g*(P.ze/P.length) + P.m2*P.g/2.0
 
         # Compute the state feedback controller
-        # After feedback linearization, apply control directly to states
-        F_tilde = -self.K @ x + self.Kr * z_r
-
-        # compute total force
-        F = saturate(F_fl + F_tilde[0, 0], P.F_max)
+        F_tilde = -self.K @ x_tilde + self.Kr * zr_tilde
+        F_unsat = F_e + F_tilde
+        F = saturate(F_unsat[0,0], P.F_max)
 
         return F
 
@@ -68,4 +65,3 @@ def saturate(u, limit):
     if abs(u) > limit:
         u = limit * np.sign(u)
     return u
-
