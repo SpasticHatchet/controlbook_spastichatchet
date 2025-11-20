@@ -14,6 +14,8 @@ class ctrlStateFeedbackIntegrator:
         B = P.Bmat
         Cr = P.Cmat[0]
 
+        self.Pi = -1  # integrator pole
+
         # build augmented A1 = [[A, 0],
         #                       [-Cr, 0]]
         Cr_row = np.reshape(np.asarray(Cr), (1, A.shape[1]))  # ensure shape (1,2)
@@ -25,8 +27,6 @@ class ctrlStateFeedbackIntegrator:
 
         print("A1:", A1)
         print("B1:", B1)
-
-        self.Pi = -1  # integrator pole
 
         des_char_poly = np.convolve([1, 2.0 * zeta * omega_n, omega_n**2], [1, -self.Pi])
         des_poles = np.roots(des_char_poly)

@@ -5,13 +5,13 @@ from signalGenerator import SignalGenerator
 from hummingbirdAnimation import HummingbirdAnimation
 from dataPlotter import DataPlotter
 from hummingbirdDynamics import HummingbirdDynamics
-from ctrlPID import ctrlPID
+from ctrlPD import ctrlPD
 
 # instantiate pendulum, controller, and reference classes
-hummingbird = HummingbirdDynamics(alpha=0.1)
-controller = ctrlPID()
-psi_ref = SignalGenerator(amplitude=30.*np.pi/180., frequency=0.02)
-theta_ref = SignalGenerator(amplitude=15.*np.pi/180., frequency=0.05)
+hummingbird = HummingbirdDynamics(alpha=0.0)
+controller = ctrlPD()
+psi_ref = SignalGenerator(amplitude=0.5, frequency=0.04)
+theta_ref = SignalGenerator(amplitude=0.6, frequency=0.05)
 
 # instantiate the simulation plots and animation
 dataPlot = DataPlotter()

@@ -5,11 +5,11 @@ from signalGenerator import SignalGenerator
 from hummingbirdAnimation import HummingbirdAnimation
 from dataPlotter import DataPlotter
 from hummingbirdDynamics import HummingbirdDynamics
-from ctrlLonPID import ctrlLonPID
+from ctrlPD import ctrlPD
 
 # instantiate pendulum, controller, and reference classes
-hummingbird = HummingbirdDynamics(alpha=0.1)
-controller = ctrlLonPID()
+hummingbird = HummingbirdDynamics(alpha=0.0)
+controller = ctrlPD()
 theta_ref = SignalGenerator(amplitude=0.5, frequency=0.1)
 
 # instantiate the simulation plots and animation
@@ -23,7 +23,7 @@ while t < P.t_end:  # main simulation loop
     # Propagate dynamics at rate Ts
     t_next_plot = t + P.t_plot
     while t < t_next_plot:
-        r = np.array([[theta_ref.square(t)], [0.]])
+        r = np.array([[phi_ref.square(t)], [0.]])
         pwms, y_ref = controller.update(r, y)
         y = hummingbird.update(pwms)  # Propagate the dynamics
         t += P.Ts  # advance time by Ts

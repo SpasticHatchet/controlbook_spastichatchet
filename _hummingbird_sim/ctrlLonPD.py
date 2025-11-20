@@ -51,7 +51,7 @@ class ctrlLonPD:
         
         # pitch control
         force_unsat = error_theta * self.kp_pitch - self.theta_dot * self.kd_pitch + force_fl
-        force = saturate(force_unsat[0], -P.force_max, P.force_max)
+        force = saturate(force_unsat[0], 0, P.force_max)
         torque = 0.
 
         # convert force and torque to pwm signals
