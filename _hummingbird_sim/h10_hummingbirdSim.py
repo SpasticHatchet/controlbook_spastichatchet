@@ -10,9 +10,9 @@ from ctrlPID import ctrlPID
 # instantiate pendulum, controller, and reference classes
 hummingbird = HummingbirdDynamics(alpha=0.2)
 controller = ctrlPID()
-disturbance = SignalGenerator(amplitude=0.1, frequency=0.01)
-psi_ref = SignalGenerator(amplitude=np.radians(20), frequency=0.04)
+disturbance = SignalGenerator(amplitude=0.05)
 theta_ref = SignalGenerator(amplitude=np.radians(15), frequency=0.05)
+psi_ref = SignalGenerator(amplitude=np.radians(20), frequency=0.01)
 
 # instantiate the simulation plots and animation
 dataPlot = DataPlotter()
@@ -50,5 +50,3 @@ while t < P.t_end:  # main simulation loop
 print('Press key to close')
 plt.waitforbuttonpress()
 plt.close()
-
-

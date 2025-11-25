@@ -10,8 +10,9 @@ from ctrlPD import ctrlPD
 # instantiate pendulum, controller, and reference classes
 hummingbird = HummingbirdDynamics(alpha=0.0)
 controller = ctrlPD()
-psi_ref = SignalGenerator(amplitude=0.5, frequency=0.04)
-theta_ref = SignalGenerator(amplitude=0.6, frequency=0.05)
+disturbance = SignalGenerator(amplitude=0.02)
+psi_ref = SignalGenerator(amplitude=np.radians(20), frequency=0.04)
+theta_ref = SignalGenerator(amplitude=np.radians(15), frequency=0.05)
 
 # instantiate the simulation plots and animation
 dataPlot = DataPlotter()
@@ -26,7 +27,12 @@ while t < P.t_end:  # main simulation loop
     while t < t_next_plot:
         r = np.array([[theta_ref.square(t)], [psi_ref.square(t)]])
         pwm, y_ref = controller.update(r, y)
-        y = hummingbird.update(pwm)  # Propagate the dynamics
+
+        d = np.array([  [disturbance.step(t) / P.d],               
+                        [disturbance.step(t) / P.d]]) / (2 * P.km)
+
+
+        y = hummingbird.update(pwm + d)  # Propagate the dynamics
         t += P.Ts  # advance time by Ts
 
     # update animation and data plots at rate t_plot
