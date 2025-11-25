@@ -6,9 +6,9 @@ class ctrlPID:
     def __init__(self):
 
         # pitch - longitudinal ###################################################
-        tr_pitch = 1.0
-        zeta_pitch = 0.9
-        wn_pitch = 2.2 / tr_pitch
+        tr_pitch = 1.5
+        zeta_pitch = 0.95
+        wn_pitch = (0.5*np.pi)/(tr_pitch * np.sqrt(1 - zeta_pitch**2))
         b_theta = P.ellT/(P.m1 * P.ell1**2 + P.m2 * P.ell2**2 + P.J1y + P.J2y)
         
         # design PID by pole matching: choose integrator pole Pi_pitch (negative)
@@ -19,13 +19,15 @@ class ctrlPID:
         # self.ki_pitch = ((-wn_pitch**2 * Pi_pitch) / b_theta)
 
         self.kp_pitch = wn_pitch**2 / b_theta
-        self.kd_pitch = 2 * zeta_pitch * wn_pitch / b_theta
-        self.ki_pitch = 0.15  # set integrator gain
+        self.kd_pitch = (2 * zeta_pitch * wn_pitch / b_theta)
+        self.ki_pitch = 0.1  # set integrator gain
  
         self.integrator_theta = 0.0
         self.integrator_theta_plus = 0.0
         self.theta_d1 = 0.
         self.theta_dot = 0.
+
+        self.error_theta_d1 = 0.
         
         print('kp_pitch: ', self.kp_pitch)
         print('kd_pitch: ', self.kd_pitch) 
@@ -33,9 +35,9 @@ class ctrlPID:
 
 
         # inner lateral loop ###################################################
-        tr_roll = 0.3
-        zeta_roll = 0.707
-        wn_roll = 2.2 / tr_roll
+        tr_roll = 2.0 / 10.0
+        zeta_roll = 0.95
+        wn_roll = (0.5*np.pi)/(tr_roll * np.sqrt(1 - zeta_roll**2)) #2.2 / tr_roll
         b_phi = 1/P.J1x
 
         self.kp_roll = (wn_roll**2 / b_phi)
@@ -48,9 +50,9 @@ class ctrlPID:
         print('kd_roll: ', self.kd_roll) 
 
         # outer lateral loop ###################################################
-        tr_yaw = 10 * tr_roll
+        tr_yaw = 2
         zeta_yaw = 0.95
-        wn_yaw = 2.2 / tr_yaw
+        wn_yaw = (0.5*np.pi)/(tr_yaw * np.sqrt(1 - zeta_yaw**2))
         Fe = (P.g * (P.ell1 * P.m1 + P.ell2 * P.m2)) / P.ellT
         b_psi = (Fe * P.ellT) / (P.J1z + P.J2z + P.J3z + 
                                  (P.ell1**2 * P.m1) + 
@@ -61,17 +63,19 @@ class ctrlPID:
         # design PID by pole matching: choose integrator pole Pi_yaw (negative)
         # Pi_yaw = -0.5 * wn_yaw  # tune this (e.g. -1.0, -5.0, etc.)
         # self.kd_yaw = ((2 * zeta_yaw * wn_yaw - Pi_yaw) / b_psi)
-        # self.kp_yaw = ((wn_yaw**2 - 2 * zeta_yaw * wn_yaw * Pi_yaw) / b_psi)
+        # self.kp_yaw = ((wn_yaw**2 - 2 * zeta_yaw * wn_yaw * Pi2.2 / tr_yaw_yaw) / b_psi)
         # self.ki_yaw = ((-wn_yaw**2 * Pi_yaw) / b_psi)
 
         self.kp_yaw = (wn_yaw**2 / b_psi)
         self.kd_yaw = (2 * zeta_yaw * wn_yaw / b_psi)
-        self.ki_yaw = 0.0001  # set integrator gain
+        self.ki_yaw = 0.05  # set integrator gain
 
         self.integrator_psi = 0.0
         self.integrator_psi_plus = 0.0
         self.psi_d1 = 0.
         self.psi_dot = 0.
+
+        self.error_psi_d1 = 0.
 
         print('kp_yaw: ', self.kp_yaw)
         print('kd_yaw: ', self.kd_yaw)
@@ -101,18 +105,24 @@ class ctrlPID:
         
         # ANTI WINDUP - Compute the integrator, then the control, then the integrator_plus, then the
         # control using the integrator_plus
-        self.integrator_theta = self.integrator_theta_plus + (P.Ts / 2) * (error_theta + (theta - self.theta_d1))
-        u_unsat = (error_theta * self.kp_pitch) - (self.theta_dot * self.kd_pitch) + (self.ki_pitch * self.integrator_theta) + force_fl
-        u_unsat = u_unsat[0]
-        u_sat = saturate(u_unsat, 0, P.force_max)
-        self.integrator_theta_plus = self.integrator_theta + (1/self.ki_pitch)*(u_sat - u_unsat)
+        # self.integrator_theta = self.integrator_theta_plus + (P.Ts / 2) * (error_theta + (theta - self.theta_d1))
+        # u_unsat = (error_theta * self.kp_pitch) - (self.theta_dot * self.kd_pitch) + (self.ki_pitch * self.integrator_theta) + force_fl
+        # u_unsat = u_unsat[0]
+        # u_sat = saturate(u_unsat, 0, P.force_max)
+        # self.integrator_theta_plus = self.integrator_theta + (1/self.ki_pitch)*(u_sat - u_unsat)
 
-        force = (error_theta * self.kp_pitch) - (self.theta_dot * self.kd_pitch) + (self.ki_pitch * self.integrator_theta_plus) + force_fl
+        # force = (error_theta * self.kp_pitch) - (self.theta_dot * self.kd_pitch) + (self.ki_pitch * self.integrator_theta_plus) + force_fl
+        # force = force[0]
+        if self.theta_dot <= 0.1:
+            self.integrator_theta = self.integrator_theta + (P.Ts / 2) * (error_theta + self.error_theta_d1)
+
+        force = (error_theta * self.kp_pitch) - (self.theta_dot * self.kd_pitch) + (self.ki_pitch * self.integrator_theta) + force_fl
+
         force = force[0]
 
         # update all delayed variables
         self.theta_d1 = theta
-
+        self.error_theta_d1 = error_theta
         #############################################################################################
 
         # psi - lateral
@@ -125,7 +135,9 @@ class ctrlPID:
                         ((2.0 / (2.0 * self.sigma + self.Ts)) * (psi - self.psi_d1)))
 
         # phi - lateral
-        phi_ref = (self.kp_yaw * error_psi) - (self.kd_yaw * self.psi_dot) + (self.ki_yaw * self.integrator_psi_plus) # comes from outer loop controller
+        phi_ref_unsat = (self.kp_yaw * error_psi) - (self.kd_yaw * self.psi_dot) + (self.ki_yaw * self.integrator_psi) # comes from outer loop controller
+        phi_ref_unsat = phi_ref_unsat[0]
+        phi_ref = saturate(phi_ref_unsat, -np.pi/4, np.pi/4)
         phi = y[0, 0]
         self.psi_d1 = psi
 
@@ -135,21 +147,21 @@ class ctrlPID:
                         ((2.0 / (2.0 * self.sigma + self.Ts)) * (phi - self.phi_d1)))
         
         # # update integrator with anti-windup
-        # if np.abs(self.psi_dot) <= 0.05:
-        #     self.integrator_psi = self.integrator_psi + (P.Ts / 2) * (error_psi + (psi - self.psi_d1))
+        if np.abs(self.psi_dot) <= 0.1:
+            self.integrator_psi = self.integrator_psi + (P.Ts / 2) * (error_psi + self.error_psi_d1)
 
-        # # roll control - tau
-        # torque = error_phi * self.kp_roll - self.phi_dot * self.kd_roll + self.ki_yaw * self.integrator_psi
-        # torque = torque[0]
-
-        self.integrator_psi = self.integrator_psi + (P.Ts / 2) * (error_psi + (psi - self.psi_d1))
-        tau_unsat = (error_phi * self.kp_roll) - (self.phi_dot * self.kd_roll) + (self.ki_yaw * self.integrator_psi)
-        tau_unsat = tau_unsat[0]
-        tau_sat = saturate(tau_unsat, -P.torque_max, P.torque_max)
-
-        self.integrator_psi_plus = self.integrator_psi + (1/self.ki_yaw)*(tau_sat - tau_unsat)
-        torque = (error_phi * self.kp_roll) - (self.phi_dot * self.kd_roll) #+ (self.ki_yaw * self.integrator_psi_plus)
+        # roll control - tau
+        torque = error_phi * self.kp_roll - self.phi_dot * self.kd_roll + self.ki_yaw * self.integrator_psi
         torque = torque[0]
+
+        # self.integrator_psi = self.integrator_psi + (P.Ts / 2) * (error_psi + (psi - self.psi_d1))
+        # tau_unsat = (error_phi * self.kp_roll) - (self.phi_dot * self.kd_roll) + (self.ki_yaw * self.integrator_psi)
+        # tau_unsat = tau_unsat[0]
+        # tau_sat = saturate(tau_unsat, -P.torque_max, P.torque_max)
+
+        # self.integrator_psi_plus = self.integrator_psi + (1/self.ki_yaw)*(tau_sat - tau_unsat)
+        # torque = (error_phi * self.kp_roll) - (self.phi_dot * self.kd_roll) + (self.ki_yaw * self.integrator_psi_plus)
+        # torque = torque[0]
 
         # convert force and torque to pwm signals
         pwm = np.array([[force + torque / P.d],               # u_left
@@ -158,9 +170,8 @@ class ctrlPID:
 
         # update all delayed variables
         self.phi_d1 = phi
-        
+        self.error_psi_d1 = error_psi
         # return pwm plus reference signals
-        phi_ref = phi_ref[0]
         return pwm, np.array([[phi_ref],[theta_ref], [psi_ref]])
 
 
@@ -172,8 +183,8 @@ def saturate(u, low_limit, up_limit):
             u = low_limit
     else:
         for i in range(0, u.shape[0]):
-            if u[i, 0] > up_limit:
-                u[i, 0] = up_limit
-            if u[i, 0] < low_limit:
-                u[i, 0] = low_limit
+            if u[i][0] > up_limit:
+                u[i][0] = up_limit
+            if u[i][0] < low_limit:
+                u[i][0] = low_limit
     return u

@@ -10,7 +10,7 @@ from ctrlPD import ctrlPD
 # instantiate pendulum, controller, and reference classes
 hummingbird = HummingbirdDynamics(alpha=0.0)
 controller = ctrlPD()
-disturbance = SignalGenerator(amplitude=0.02)
+disturbance = SignalGenerator(amplitude=0.00)
 psi_ref = SignalGenerator(amplitude=np.radians(20), frequency=0.04)
 theta_ref = SignalGenerator(amplitude=np.radians(15), frequency=0.05)
 

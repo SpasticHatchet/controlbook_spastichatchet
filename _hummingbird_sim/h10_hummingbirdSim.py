@@ -8,11 +8,11 @@ from hummingbirdDynamics import HummingbirdDynamics
 from ctrlPID import ctrlPID
 
 # instantiate pendulum, controller, and reference classes
-hummingbird = HummingbirdDynamics(alpha=0.2)
+hummingbird = HummingbirdDynamics(alpha=0.0)
 controller = ctrlPID()
-disturbance = SignalGenerator(amplitude=0.05)
+#disturbance = SignalGenerator(amplitude=0.1)
 theta_ref = SignalGenerator(amplitude=np.radians(15), frequency=0.05)
-psi_ref = SignalGenerator(amplitude=np.radians(20), frequency=0.01)
+psi_ref = SignalGenerator(amplitude=np.radians(20), frequency=0.04)
 
 # instantiate the simulation plots and animation
 dataPlot = DataPlotter()
@@ -31,9 +31,9 @@ while t < P.t_end:  # main simulation loop
         # How do we add a disturbance to the system if the value we get pack is pwm?
         # We can do what's done to the force and torque in ctrlPD.py and simply add 
         # the disturbance to the pwm signal.
-    
-        d = np.array([  [disturbance.step(t) / P.d],               
-                        [disturbance.step(t) / P.d]]) / (2 * P.km)
+        d = 0.05
+        # dist = np.array([[d / P.d],
+        #                  [d / P.d]]) / (2 * P.km)
         #d = saturate(pwm, 0, 1)
 
         y = hummingbird.update(pwm + d)  # Propagate the dynamics
