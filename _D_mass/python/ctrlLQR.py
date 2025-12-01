@@ -10,8 +10,8 @@ class ctrlLQR:
         # LQR Control Design with integrator and observer
         #--------------------------------------------------
         # tuning parameters
-        Q = np.diag([10.0, 10.0, 10.0])  # [z, z_dot, integrator]
-        R = np.diag([0.10])  # [F]   
+        Q = np.diag([5.0, 5.0, 150.0])  # [z, z_dot, integrator]
+        R = np.diag([.01])  # [F]   
 
         # State Space Equations
         # xdot = A*x + B*u
