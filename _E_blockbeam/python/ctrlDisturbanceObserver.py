@@ -11,7 +11,7 @@ class ctrlDisturbanceObserver:
         zeta_z = 0.95     # damping ratio position
         zeta_th = 0.95    # damping ratio angle
         integrator_pole = -5.0
-        disturbance_observer_pole = -10.0
+        dist_observer_pole = -10.0
 
         # pick observer poles
         tr_z_obs = tr_z / 10.0
@@ -20,17 +20,17 @@ class ctrlDisturbanceObserver:
         # State Space Equations
         # xdot = A*x + B*u
         # y = C*x
-        self.A = P.Amat
-        self.B = P.Bmat
-        self.C = P.Cmat
-        self.Cr = self.C[0]
+        A = P.Amat
+        B = P.Bmat
+        C = P.Cmat
+        Cr = C[0]
 
         # form augmented system for integral control
         A1 = np.vstack((
-                np.hstack((self.A, np.zeros((4,1)))),
-                np.hstack((-self.Cr, np.zeros((1,1))))))
+                np.hstack((A, np.zeros((4,1)))),
+                np.hstack((-Cr, np.zeros((1,1))))))
         print("A1:",A1)
-        B1 = np.vstack((self.B, np.zeros((1,1))))
+        B1 = np.vstack((B, np.zeros((1,1))))
         
         # gain calculation
         wn_th = 0.5*np.pi/(tr_theta*np.sqrt(1-zeta_th**2))
@@ -49,95 +49,109 @@ class ctrlDisturbanceObserver:
             self.K = K1[0][0:4]
             self.ki = K1[0][4]
 
-        # compute observer gains
+        # disturbance observer design
+        A2 = np.block([[A, B],
+                       [np.zeros((1, A.shape[1])), 0]])
+        print("A2:",A2)
+        B2 = B1  # same as B1
+        C2 = np.block([C, np.zeros((C.shape[0], 1))])
+        print("C2:",C2)
+
+
         wn_z_obs = 0.5*np.pi/(tr_z_obs*np.sqrt(1-zeta_z**2))
         wn_th_obs = 0.5*np.pi/(tr_th_obs*np.sqrt(1-zeta_th**2))
-        des_obs_char_poly = np.convolve(
+        des_obs_char_poly = np.convolve(np.convolve(
             [1, 2*zeta_z*wn_z_obs, wn_z_obs**2],
-            [1, 2*zeta_th*wn_th_obs, wn_th_obs**2])
+            [1, 2*zeta_th*wn_th_obs, wn_th_obs**2]),
+            [1, -dist_observer_pole])
         des_obs_poles = np.roots(des_obs_char_poly)
 
         # Compute the gains if the system is observable
-        if np.linalg.matrix_rank(cnt.ctrb(self.A.T, self.C.T)) != self.A.T.shape[0]:
+        if np.linalg.matrix_rank(cnt.ctrb(A2.T, C2.T)) != A2.T.shape[0]:
             print("The system is not observable")
         else:
             # .T transposes the output
-            self.L = cnt.place(self.A.T, self.C.T, des_obs_poles).T
-            print("A shape:",self.A.shape)
-            print(("C shape,",self.C.shape))
+            L2 = cnt.place(A2.T, C2.T, des_obs_poles).T
         print('K: ', self.K)
         print('ki: ', self.ki)
-        print('L^T: ', self.L.T)
+        print('L^T: ', L2.T)
 
         # variables to implement integrator
         self.integrator_z = 0.0  # integrator
-        self.error_z_prev = 0.0  # error signal delayed by 1 sample
-
-        # initializing estimated state variables
-        self.x_hat = np.array([
-            [0.0],  # initial estimate for z_hat
-            [0.0],  # initial estimate for theta_hat
-            [0.0],  # initial estimate for z_hat_dot
-            [0.0]])  # initial estimate for theta_hat_dot
-        self.F_prev = 0.0  # Computed Force, delayed by one sample
+        self.error_z_d1 = 0.0  # error signal delayed by 1 sample
+        self.obsv_state = np.array([
+            [0.0],  # z_hat_0
+            [0.0],  # theta_hat_0
+            [0.0],  # z_hat_dot_0
+            [0.0],  # theta_hat_dot_0
+            [0.0]])  # estimate of the disturbance
+        self.force_d1 = 0.0  # Computed Force, delayed by one sample
+        self.L = L2
+        self.A = A2
+        self.B = B1
+        self.C = C2
+        self.Cr = Cr
         self.Ts = P.Ts
 
-    def update(self, z_r, y):
-        # update the observer and extract z_hat
-        x_hat = self.update_observer(y)
+    def update(self, z_r, y_m):
+        x_hat, d_hat = self.update_observer(y_m)
         z_hat = self.Cr @ x_hat
 
         # integrate error
         error_z = z_r - z_hat
         self.integrator_z = self.integrator_z \
-            + (P.Ts / 2.0) * (error_z + self.error_z_prev)
-        self.error_z_prev = error_z
+            + (P.Ts / 2.0) * (error_z + self.error_z_d1)
+        self.error_z_d1 = error_z
 
         # Construct the linearized state
         xe = np.array([[P.ze], [0.0], [0.0], [0.0]])
         x_tilde = x_hat - xe
 
         # equilibrium force
-        F_e = P.m1*P.g*P.ze/P.length + P.m2*P.g/2.0
+        force_e = P.m1*P.g*P.ze/P.length + P.m2*P.g/2.0
 
         # Compute the state feedback controller
-        F_tilde = -self.K @ x_tilde \
-                  - self.ki * self.integrator_z
-        F_unsat = F_e + F_tilde
-        F = saturate(F_unsat[0][0], P.F_max)
-        self.integratorAntiWindup(F, F_unsat)
-        self.F_prev = F
+        force_tilde = -self.K @ x_tilde \
+                  - self.ki * self.integrator_z \
+                  - d_hat
+        force_unsat = force_e + force_tilde
+        force = saturate(force_unsat[0][0], P.F_max)
+        self.integratorAntiWindup(force, force_unsat)
+        self.force_d1 = force
 
-        return F, x_hat
+        return force, x_hat, d_hat
 
-    def update_observer(self, y):
+    def update_observer(self, y_m):
         # update the observer using RK4 integration
-        F1 = self.observer_f(self.x_hat, y)
-        F2 = self.observer_f(self.x_hat + self.Ts / 2 * F1, y)
-        F3 = self.observer_f(self.x_hat + self.Ts / 2 * F2, y)
-        F4 = self.observer_f(self.x_hat + self.Ts * F3, y)
-        self.x_hat += self.Ts / 6 * (F1 + 2 * F2 + 2 * F3 + F4)
-        return self.x_hat
+        F1 = self.observer_f(self.obsv_state, y_m)
+        F2 = self.observer_f(self.obsv_state + self.Ts / 2 * F1, y_m)
+        F3 = self.observer_f(self.obsv_state + self.Ts / 2 * F2, y_m)
+        F4 = self.observer_f(self.obsv_state + self.Ts * F3, y_m)
+        self.obsv_state += self.Ts / 6 * (F1 + 2 * F2 + 2 * F3 + F4)
+        x_hat = self.obsv_state[0:4]
+        d_hat = self.obsv_state[4, 0]
 
-    def observer_f(self, x_hat, y):
+        return x_hat, d_hat
+
+    def observer_f(self, x_hat, y_m):
         # xhatdot = A*(xhat-xe) + B*u + L(y-C*xhat)
-        xe = np.array([[P.ze], [0.0], [0.0], [0.0]])
+        xe = np.array([[P.ze], [0.0], [0.0], [0.0], [0.0]])
 
         # equilibrium force
-        F_e = P.m1*P.g*P.ze/P.length + P.m2*P.g/2.0
+        force_e = P.m1*P.g*P.ze/P.length + P.m2*P.g/2.0
 
         # observer dynamics
         xhat_dot = self.A @ (x_hat - xe) \
-                   + self.B * (self.F_prev - F_e) \
-                   + self.L @ (y - self.C @ x_hat)
+                   + self.B * (self.force_d1 - force_e) \
+                   + self.L @ (y_m - self.C @ x_hat)
         
         return xhat_dot
 
-    def integratorAntiWindup(self, F, F_unsat):
+    def integratorAntiWindup(self, force, force_unsat):
         # integrator anti - windup
         if self.ki != 0.0:
             self.integrator_z = self.integrator_z \
-                              + P.Ts/self.ki*(F-F_unsat)
+                              + P.Ts/self.ki*(force-force_unsat)
 
 
 def saturate(u, limit):
